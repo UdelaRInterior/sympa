@@ -1,465 +1,1003 @@
-# {{ ansible_managed }}
-###\\\\ Site customization ////###
+###\\\\ Descripción del servicio ////###
 
-## domain Main robot hostname Example: domain	domain.tld
+## domain
+## Nombre del dominio primario de correo
+## Ejemplo: domain	mail.example.org
 domain	{{ sympa_domain }}
-logo_html_definition {{ sympa_logo_html_definition }}
-
-## email Local part of sympa email address Effective address will be [EMAIL]@[HOST]
-email	{{ sympa_email }}
-
-## gecos Gecos for service mail sent by Sympa itself This parameter is used for display name in the "From:" header
-gecos	{{ sympa_gecos }}
 
 ## listmaster
-## Listmasters email list comma separated
-## Sympa will associate listmaster privileges to these email addresses (mail
-## and web interfaces). Some error reports may also be sent to these
-## addresses.
-## Example: listmaster	your_email_address@domain.tld
+## Dirección de correo de los listmasters
+## Dirección de correo de los listmasters (usuarios autorizados para ejecutar
+## comandos globales en el servidor). También se envían a estas direcciones
+## algunos informes de errores. Los listmasters se pueden definir para cada
+## servidor virtual, sin embargo, los listmasters por defecto tienen el
+## privilegio de gestionar todos los servidores virtuales .
+## Ejemplo: listmaster	your_email_address@domain.tld
 listmaster	{{ sympa_listmaster | join(",") }}
 
-## wwsympa_url
-## URL of main Web page
-## Example: wwsympa_url	http://host.domain.tld/sympa
-wwsympa_url	{{ sympa_wwsympa_url }}
+## lang
+## Idioma por defecto
+## Este es el idioma por defecto usado por Sympa. Tienes que elegir uno de los
+## idiomas soportados.
+lang	{{ sympa_lang }}
 
-## process_archive
-## Store distributed messages into archive
-## This setting can be overridden by each list
-process_archive	{% if sympa_process_archive %}on{% else %}off{% endif %}
+## supported_lang
+## Idiomas soportados
+## Todos los idiomas soportados para la interfaz de usuario. Se ignoran los
+## idiomas de los que no esté instalada la información de locale.
+supported_lang  {{ sympa_supported_lang }}
 
-## voot_feature
-voot_feature {% if sympa_voot_feature %}on{% else %}off{% endif %}
+## title
+## Título del servicio
+## El nombre de tu servicio de listas de correo. Aparece en la cabecera de la
+## interfaz web y en los asuntos de diferentes mensaje del servicio.
+title	{{ sympa_web_page_title }}
 
-## max_wrong_password
-max_wrong_password	{{ sympa_max_wrong_password }}
+## gecos
+## Nombre que se muestra del Sympa
+## Este parámetro se usa para el nombre que se muestra en el campo "De:" de
+## las cabeceras de los mensajes enviados por el propio Sympa.
+gecos	{{ sympa_gecos }}
 
-## static_content_path
-## Directory for storing static contents (CSS, members pictures,
-## documentation) directly delivered by HTTP server
-static_content_path	{{ sympa_static_content_path }}
+## legacy_character_support_feature
+## Soporte para conjuntos de caracteres heredados
+## Si lo ajustas a "on" habilitas el soporte para conjuntos de caracteres
+## heredados en el fichero de configuración charset.conf(5).
+## En algunos idiomas, la codificación (conjuntos de caracteres) heredada
+## puede ser la preferida para los mensajes de correo: por ejemplo, ISO-2022-
+## jp en japonés.
+#legacy_character_support_feature	off
 
-## static_content_url
-## URL mapped with the static_content_path directory defined above
-static_content_url	{{ sympa_static_content_url }}
+###\\\\ Relacionado con la base de datos ////###
 
-## cookie
-## Secret used by Sympa to make MD5 fingerprint in web cookies secure
-## Should not be changed ! May invalid all user password
-## Example: cookie	123456789
-cookie	`/usr/bin/head -n1 /etc/sympa/cookie`
+## db_type
+## Tipo de base de datos
+## Los tipos posibles son "MySQL", "PostgreSQL", "Oracle" y "SQLite".
+db_type	{{ sympa_db_type }}
 
-###\\\\ System related ////###
+## db_host
+## Nombre del servidor de bases de datos
+## Con PostgreSQL también puedes usar la ruta al Directorio del Socket Unix,
+## por ejemplo, "/var/run/postgresql" para conexiones con el socket del
+## dominio Unix.
+## Ejemplo: db_host	localhost
+db_host	{{ sympa_db_host }}
+
+## db_port
+## Puerto del servidor de bases de datos
+db_port	{{ sympa_db_port }}
+
+## db_name
+## Nombre de la base de datos
+## Con SQLite, esta tiene que ser la ruta completa al fichero de la base de
+## datos.
+## Con Oracle Database, declara aquí el SID, el nombre de servicio de red o el
+## identificador de conexión sencilla (para usar el nombre de servicio de red,
+## hay que establecer el db_host a "none" mientras que HOST, PORT y
+## SERVICE_NAME son los valores definidos en el fichero tnsnames.ora).
+db_name	{{ sympa_db_name }}
+
+## db_user
+## Usuario para la conexión con la base de datos
+## Ejemplo: db_user	sympa
+db_user	{{ sympa_db_user }}
+
+## db_passwd
+## Contraseña para la conexión con la base de datos
+## Uses o no una contraseña, tienes que proteger el servidor SQL (no es un
+## servicio público en internet, ¿no?)
+## Ejemplo: db_passwd	your_passwd
+db_passwd   {{ sympa_db_password }}
+
+## db_env
+## Ajuste de variables de entorno para la base de datos
+## Con una base de datos Oracle esto es útil para definir ORACLE_HOME y
+## NLS_LANG.
+## Ejemplo: db_env	NLS_LANG=American_America.AL32UTF8;ORACLE_HOME=/u01/app/oracle/product/11.2.0/server
+#db_env	
+
+## db_additional_subscriber_fields
+## Extensión privada de la base de datos a la tabla de suscriptores
+## Añade más campos a la tabla "subscriber_table". Sympa reconoce los campos
+## definidos con este parámetro. Podrás usarlos en las plantillas y en los
+## escenarios:
+##  * para los escenarios: [subscriber->field]
+##  * para las plantillas: [% subscriber.field %]
+## Estos campos también aparecerán en la página de revisión de miembros de la
+## lista y serán editables por el propietario de la lista. Este parámetro es
+## una lista separada por comas.
+## Es necesario extender el formato de la base de datos con estos campos
+## Ejemplo: db_additional_subscriber_fields	billing_delay,subscription_expiration
+#db_additional_subscriber_fields	
+
+## db_additional_user_fields
+## Extensión privada de la base de datos a la tabla de usuarios
+## Añade más campos a la tabla "user_table". Sympa reconoce los campos
+## definidos con este parámetro. Podrás usarlos en las plantillas: [%
+## subscriber.field %]
+## Este parámetro es una lista separada por comas.
+## Es necesario extender el formato de la base de datos con estos campos
+## Ejemplo: db_additional_user_fields	age,address
+#db_additional_user_fields	
+
+###\\\\ Registro de sistema ////###
 
 ## syslog
-## Syslog facility for sympa
-## Do not forget to edit syslog.conf
+## Servicio de registro de sistema para Sympa
+## No olvides configurar el servidor de syslog.
 syslog	{{ sympa_syslog }}
 
-## log_level
-## Log verbosity
-## 0: normal, 2,3,4: for debug
-log_level	{{ sympa_log_level }}
-
 ## log_socket_type
-## Communication mode with syslogd (unix | inet)
+## Modo de comunicación con el servidor de syslog
 log_socket_type	{{ sympa_log_socket_type }}
 
-###\\\\ Sending related ////###
+## log_level
+## Verbosidad del registro
+## Establece la verbosidad de los registros.
+## 0: Solo se registran las principales operaciones
+## 3: Se registra casi todo.
+## Ejemplo: log_level	2
+log_level	{{ sympa_log_level }}
+
+###\\\\ Recibiendo ////###
+
+## default_max_list_members
+## Número máximo por defecto de miembros de una lista
+## Límite por defecto de suscriptores por lista (0 implica sin límite).
+default_max_list_members	{{ sympa_default_max_list_members }}
+
+## max_size
+## Tamaño máximo de los mensajes
+## Sympa solo distribuye los mensaje con un tamaño inferior al que se indica.
+## Ejemplo: max_size	2097152
+max_size  {{ sympa_max_size }}
+
+## reject_mail_from_automates_feature
+## Mensaje rechazado proviniente de un servicio automatizado
+## Rechaza los mensajes que parecen provenir de servicios automáticos
+## basándose enalgunas cabeceras ("Content-Identifier:", "Auto-Submitted:").
+## También puedes configurar Sympa para rechazar mensajes en base al valor de
+## la cabecera "From:" (revisa "loop_prevention_regex").
+## Ejemplo: reject_mail_from_automates_feature	off
+#reject_mail_from_automates_feature	on
+reject_mail_from_automates_feature {% if sympa_reject_mail_from_automates_feature %}on{% else %}off{% endif %}
+
+## sympa_priority
+## Prioridad a los mensajes de comandos
+## Prioridad aplicada a los mensajes enviados a la dirección de comandos de
+## Sympa.
+sympa_priority	{{ sympa_packet_priority }}
+
+## request_priority
+## Prioridad a los mensajes enviados al propietario de las listas
+## Prioridad para procesar los mensajes dirigidos a las direcciones "LISTA-
+## request", es decir, a los propietario de la lista
+request_priority {{ sympa_request_priority }}
+
+## owner_priority
+## Prioridad a los rechazos no VERP
+## Prioridad para procesar los mensajes dirigidos a las direcciones "LIST-
+## owner", es decir, informes de no entrega (rechazos).
+owner_priority	{{ sympa_owner_priority }}
+
+## default_list_priority
+## Prioridad por defecto a los mensajes para las listas
+## Prioridad para procesar los mensajes enviados a las direcciones de las
+## listas.
+default_list_priority	{{ sympa_default_list_priority }}
+
+###\\\\ Relacionado con el envío ////###
+
+## remove_headers
+## Campos de la cabecera que se eliminarán de los mensajes recibidos
+## Úsalo, por ejemplo, para asegurar alguna privacidad para los usuarios en
+## caso de que el modo "anonymous_sender" no sea apropiado.
+## La eliminación de estas cabeceras se realiza antes de que Sympa añada las
+## suyas propias ("rfc2369_header_fields" e "custom_header").
+## Ejemplo: remove_headers	Resent-Date,Resent-From,Resent-To,Resent-Message-Id,Sender,Delivered-To
+remove_headers	{{ sympa_remove_headers | join(",") }}
+
+## rfc2369_header_fields
+## Campos de la cabecera RFC 2369
+## Especifica qué cabeceras de las listas de distribución definidas en la RFC
+## 2369 se van a añadir.
+## "List-Id:" esta cabecera, definida en la RFC 2919, se añade siempre. Sympa
+## también añade la cabecera "Archived-At:" definida en la RFC 5064.
+rfc2369_header_fields	{{ sympa_rfc2369_header_fields | join(",") }}
+
+## sympa_packet_priority
+## Prioridad por defecto para un paquete
+## La prioridad por defecto asignada a un paquete al ser enviado por el bulk.
+sympa_packet_priority	{{ sympa_packet_priority }}
+
+## bulk_fork_threshold
+## Umbral de bifurcación de un servicio bulk
+## El número mínimo de paquetes antes de que el servicio bulk maestro bifurque
+## el proceso para incrementar el ratio de envío.
+bulk_fork_threshold	{{ sympa_bulk_fork_threshold }}
+
+## bulk_max_count
+## Número máximo de procesos bulk
+bulk_max_count	{{ sympa_bulk_max_count }}
+
+## bulk_lazytime
+## Tiempo de inactividad antes de expirar los procesos bulk
+## El número de segundos que un proceso bulk permanece ejecutándose sin
+## procesar un mensaje antes de desaparecer espontáneamente.
+bulk_lazytime	{{ sympa_bulk_lazytime }}
+
+## bulk_sleep
+## Tiempo de espera de los procesos bulk
+## El número de segundos que un proceso bulk sin mensajes para enviar espera
+## antes de comenzar un nuevo ciclo.
+## Establece un valor bajo si quieres que tu servidor responda con agilidad.
+bulk_sleep	{{ sympa_bulk_sleep }}
+
+## bulk_wait_to_fork
+## Intervalo entre comprobación de los números de paquete
+## Número de segundos que un servicio bulk maestro espera entre la
+## comprobación de dos números de paquete.
+## Establece un valor bajo si esperas aumentos enormes en la carga de envío de
+## mensajes.
+bulk_wait_to_fork	{{ sympa_bulk_wait_to_fork }}
 
 ## sendmail
-## Path to the MTA (sendmail, postfix, exim or qmail)
-## should point to a sendmail-compatible binary (eg: a binary named "sendmail"
-## is distributed with Postfix)
+## Ruta a sendmail
+## Ruta absoluta a la utilidad sendmail de línea de comandos (por ejemplo: un
+## binario llamado "sendmail" que se distribuye con Postfix).
+## Sympa espera que este binario sea compatible con sendmail (exim, Postfix,
+## qmail y otros lo suministran).
 sendmail	{{ sympa_sendmail }}
 
-## maxsmtp
-## Max. number of Sendmail processes (launched by Sympa) running
-## simultaneously
-## Proposed value is quite low, you can rise it up to 100, 200 or even 300
-## with powerful systems.
-maxsmtp	{{ sympa_maxsmtp }}
-
 ## log_smtp
+## Registro de llamadas a sendmail
+## Esto se puede sobreescribir con la opción "-m" de sympa.pl.
 log_smtp	{% if sympa_log_smtp %}on{% else %}off{% endif %}
 
+## maxsmtp
+## Número máximo de procesos de sendmail
+## Número máximo de procesos hijo simultáneos generados por Sympa. Este es el
+## parámetro principal de control de carga.
+## El valor propuesto es bastante bajo, pero puedes aumentarlo a 100, 200 o
+## 300 en sistemas más potentes.
+## Ejemplo: maxsmtp	500
+maxsmtp	{{ sympa_maxsmtp }}
+
+## nrcpt
+## Número máximo de destinatarios por llamada a sendmail
+## Este factor de agrupamento hace posible que el proceso sendmail optimice el
+## número de sesiones SMTP necesarias para la distribución de mensajes. Si lo
+## necesitas, puedes limitar el número de destinatarios para un dominio
+## específico. Revisa el fichero de configuración "nrcpt_by_domain.conf".
+nrcpt	{{ sympa_sendmail_nrcpt }}
+
+## avg
+## Número máximo de dominios diferentes de correo por llamada a sendmail
+avg	{{ sympa_sendmail_avg }}
+
+###\\\\ Privilegios ////###
+
+## create_list
+## Quien puede crear listas
+## Define quien puede crear listas (o solicitar su creación), tanto creando
+## nuevas listas, como renombrando o copiando listas ya existentes.
+## Ejemplo: create_list	intranet
+create_list	{{sympa_create_list}}
+
 ## use_blacklist
-## comma separated list of operations for which blacklist filter is applied
-## Setting this parameter to "none" will hide the blacklist feature
+## Usar lista negra
+## Lista de operaciones separadas por coma para las se aplica el filtro de
+## lista negra. Estabeciendo este parámetro a "none" se ocultará la
+## característica de lista negra.
 {% if sympa_use_blacklist | length>0 %}
 use_blacklist	{{ sympa_use_blacklist | join(',') }}
 {% else %}
 use_blacklist	none
 {% endif %}
 
-## max_size
-## Default maximum size (in bytes) for messages (can be re-defined for each
-## list)
-max_size	{{ sympa_max_size }}
+## owner_domain
+## Lista de dominios obligatorios para las direcciones de propietarios de la
+## lista
+## Restringe la propiedad de las listas a usuarios de los dominios
+## especificados. Esto puede ser útil para reservar la propiedad de las listas
+## a un grupo de usuarios de confianza de un conjunto de dominios asociados
+## con la organización, al tiempo que se permite que los editores y
+## suscriptores pertenezcan a cualquier dominio de internet.
+## Ejemplo: owner_domain	domain1.tld domain2.tld
+#owner_domain	
 
-## nrcpt
-## Maximum number of recipients per call to Sendmail. The nrcpt_by_domain.conf
-## file allows a different tuning per destination domain.
-nrcpt	{{ sympa_sendmail_nrcpt }}
+## owner_domain_min
+## Número mínimo de propietarios de cada lista que tienen que coincidir con la
+## restricción de owner_domain
+## Número mínimo de propietarios de cada lista que tienen que satisfacer la
+## restricción de owner_domain. El valor por defecto cero (0) indica que TODOS
+## los propietarios de las listas tienen que cumplir la restricción.
+## Establecerlo a 1 indica que, por lo menos, uno de los propietarios de cada
+## lista tiene que coincidir con la restricción; el resto pueden ser de otros
+## dominios. Este parámetro puede usarse para asegurar que sempre hay, por lo
+## menos, uno o más puntos de contacto con cada lista.
+## Ejemplo: owner_domain_min	1
+#owner_domain_min	0
 
-## avg
-## Max. number of different domains per call to Sendmail
-avg	{{ sympa_sendmail_avg }}
+###\\\\ Archivos ////###
 
-## rfc2369_header_fields
-## Specify which rfc2369 mailing list headers to add
-rfc2369_header_fields	{{ sympa_rfc2369_header_fields | join(",") }}
+## process_archive
+## Almacenar los mensajes distribuídos en un archivo
+## Cuando está habilitado, se archivarán los mensajes enviados a través de las
+## listas. En caso contrario, el archivado está deshabilitado.
+## Observa que si lo deshabilitas no se eliminan los archivos ya creados en
+## las listas y se podrá acceder a ellos según la configuración de acceso de
+## cada una de ellas.
+process_archive	{% if sympa_process_archive %}on{% else %}off{% endif %}
 
-## remove_headers
-## Specify header fields to be removed before message distribution
-remove_headers	{{ sympa_remove_headers | join(",") }}
+## custom_archiver
+## Archivador personalizado
+## Activa un archivador personalizado en vez de MHonArc. El valor de este
+## parámetro es la ruta absoluta al fichero ejecutable.
+## Sympa llama a este fichero con estos dos argumentos:
+## --list
+## La dirección de correo de la lista, incluyendo el dominio.
+## --file
+## La ruta absoluta al mensaje que se va a archivar.
+{% if sympa_custom_archiver is defined %}
+custom_archiver	{{ sympa_custom_archiver }}
+{% endif %}
 
-## reject_mail_from_automates_feature
-## Reject mail from automates (crontab, etc) sent to a list?
-reject_mail_from_automates_feature {% if sympa_reject_mail_from_automates_feature %}on{% else %}off{% endif %}
+## mhonarc
+## Ruta al conversor correo-a-HTML MHonArc
+## Esto es necesario para archivar correo como HTML.
+mhonarc	{{sympa_path_mhonarc}}
 
-###\\\\ Bulk mailer ////###
-
-## sympa_packet_priority
-## Default priority for a packet to be sent by bulk.
-sympa_packet_priority	{{ sympa_packet_priority }}
-
-## bulk_fork_threshold
-## Minimum number of packets in database before the bulk forks to increase
-## sending rate
-bulk_fork_threshold	{{ sympa_bulk_fork_threshold }}
-
-## bulk_max_count
-## Max number of bulks that will run on the same server
-bulk_max_count	{{ sympa_bulk_max_count }}
-
-## bulk_lazytime
-## The number of seconds a slave bulk will remain running without processing a
-## message before it spontaneously dies.
-bulk_lazytime	{{ sympa_bulk_lazytime }}
-
-## bulk_sleep
-## The number of seconds a bulk sleeps between starting a new loop if it
-## didn't find a message to send.
-## Keep it small if you want your server to be reactive.
-bulk_sleep	{{ sympa_bulk_sleep }}
-
-## bulk_wait_to_fork
-## Number of seconds a master bulk waits between two packets number checks.
-## Keep it small if you expect brutal increases in the message sending load.
-bulk_wait_to_fork	{{ sympa_bulk_wait_to_fork }}
-
-###\\\\ Quotas ////###
-
-## default_max_list_members
-## Default limit for the number of subscribers per list (0 means no limit)
-default_max_list_members	{{ sympa_default_max_list_members }}
-
-###\\\\ Spool related ////###
-
-## spool
-## Directory containing various specialized spools
-## All spool are created at runtime by sympa.pl
-spool	{{ sympa_spool }}
-
-## queue
-## Directory for message incoming spool
-queue	{{ sympa_queue }}
-
-## queuemod
-## Directory for moderation spool
-queuemod	{{ sympa_queuemod }}
-
-## queuedigest
-## Directory for digest spool
-queuedigest	{{ sympa_queuedigest }}
-
-## queueauth
-## Directory for authentication spool
-queueauth	{{ sympa_queueauth }}
-
-## queueoutgoing
-## Directory for archive spool
-queueoutgoing	{{ sympa_queueoutgoing }}
-
-## queuesubscribe
-## Directory for subscription spool
-queuesubscribe	{{ sympa_queuesubscribe }}
-
-## queuetopic
-## Directory for topic spool
-queuetopic	{{ sympa_queuetopic }}
-
-## queuebounce
-## Directory for bounce incoming spool
-queuebounce	{{ sympa_queuebounce }}
-
-## queuetask
-## Directory for task spool
-queuetask	{{ sympa_queuetask }}
-
-## queueautomatic
-## Directory for automatic list creation spool
-queueautomatic	{{ sympa_queueautomatic }}
-
-## queuebulk
-## Directory for message outgoing spool
-queuebulk	{{ sympa_queuebulk }}
-
-## viewmail_dir
-## Directory containing HTML file generated by MHonArc while displaying
-## messages other than archives
-viewmail_dir	{{ sympa_viewmail_dir }}
-
-###\\\\ Internationalization related ////###
-
-## lang
-## Default language (one of supported languages)
-## This is the default language used by Sympa
-lang	{{ sympa_lang }}
-
-###\\\\ Bounce related ////###
-
-## welcome_return_path
-## Welcome message return-path ( unique | owner )
-## If set to unique, new subcriber is removed if welcome message bounce
-welcome_return_path	{{ sympa_welcome_return_path }}
-
-## remind_return_path
-## Remind message return-path ( unique | owner )
-## If set to unique, subcriber is removed if remind message bounce, use with
-## care
-remind_return_path	{{ sympa_remind_return_path }}
-
-## bounce_path
-## Directory for storing bounces
-## Better if not in a critical partition
-bounce_path	{{ sympa_bounce_path }}
-
-## expire_bounce_task
-## Task name for expiration of old bounces
-expire_bounce_task	{{ sympa_expire_bounce_task }}
+###\\\\ Gestión de rechazos y seguimiento ////###
 
 ## bounce_warn_rate
-## Bouncing email rate for warn list owner
+## Índice de aviso de rechazo por defecto
+## El propietario de las listas recibe un aviso cuando, durante la
+## distribución de un mensaje, el porcentaje de rechazos supera este valor.
 bounce_warn_rate	{{ sympa_bounce_warn_rate }}
 
 ## bounce_halt_rate
-## Bouncing email rate for halt the list (not implemented)
-## Not yet used in current version, Default is 50
+## Índice de parada por rechazo por defecto
+## FUERA DE USO. Si el índice de rechazos alcanza este valor, se detienen los
+## mensajes a la lista, es dicir, quedan retinidos para una moderación
+## posterior.
 bounce_halt_rate	{{ sympa_bounce_halt_rate }}
 
-###\\\\ Tuning ////###
+## welcome_return_path
+## Eliminar los nuevos usuarios en rechazo
+## Si lo ajustas a unique, el mensaje de bienvenida se envía usando una
+## dirección de retorno única para eliminar inmediatamente a los suscriptores
+## en rechazo.
+welcome_return_path	{{ sympa_welcome_return_path }}
 
-## cache_list_config
-## Use of binary version of the list config structure on disk (none |
-## binary_file)
-## Set this parameter to "binary_file" if you manage a big amount of lists
-## (1000+); it should make the web interface startup faster
-cache_list_config	{{ sympa_cache_list_config }}
+## remind_return_path
+## Mensaje recordatorio de eliminación de usuarios en rechazo
+## Lo mismo que welcome_return_path, pero aplicado a mensajes recordatorios.
+remind_return_path	{{ sympa_remind_return_path }}
 
-## sympa_priority
-## Sympa commands priority
-sympa_priority	{{ sympa_sympa_priority }}
+## expire_bounce_task
+## Tarea de terminación de los rechazos antiguos
+## Esta tarea restablece la información de rechazo de las direcciones que no
+## rechazaron correo en los 10 días posteriores a la última distribución de
+## mensajes.
+expire_bounce_task	{{ sympa_expire_bounce_task }}
 
-## request_priority
-request_priority	{{ sympa_request_priority }}
+###\\\\ Listas automáticas ////###
 
-## owner_priority
-owner_priority	{{ sympa_owner_priority }}
-
-## default_list_priority
-## Default priority for list messages
-default_list_priority	{{ sympa_default_list_priority }}
+## automatic_list_families
+## Definición de familias de listas automáticas
+## Define las familias en las que se basan las listas automáticas. Consta de
+## una cadena de caracteres estructurada de la siguiente forma:
+## * cada familia se separa de la otra por un punto y coma (;)
+## * dentro de la definición de una familia cada campo se separa del otro por
+## dos puntos (:)
+## * cada campo tiene la estructura "<field name>=<field value>"
+## Básicamente, cada vez que Sympa utiliza las familias de listas automáticas
+## los valores definidos por este parámetro están disponibles en el objeto de
+## la familia.
+## * en los escenarios: [family->name]
+## * en los plantillas: [% family.name %]
+## Ejemplo: automatic_list_families	name=family_one:prefix=f1:display=My automatic lists:prefix_separator=+:classes separator=-:family_owners_list=alist@domain.tld;name=family_two:prefix=f2:display=My other automatic lists:prefix_separator=+:classes separator=-:family_owners_list=anotherlist@domain.tld;
+#automatic_list_families	
 
 ## parsed_family_files
-## comma-separated list of files that will be parsed by Sympa when
-## instantiating a family (no space allowed in file names)
-parsed_family_files	{{ sympa_parsed_family_files }}
+## ficheros analizados para familias
+## lista de ficheros separados por comas que serán analizados por Sympa cuando
+## se crea una familia (no se permiten espacios en los nombres de los
+## ficheros)
+parsed_family_files	{{ sympa_parsed_family_files | join(",") }}
 
-###\\\\ Database related ////###
+###\\\\ Filtrado de spam basado en marcas ////###
 
-## db_type
-## Type of the database (mysql|Pg|Oracle|Sybase|SQLite)
-## Be careful to the case
-db_type	mysql
+## antispam_tag_header_name
+## Campo de la cabecera para marcar spam
+## Si un filtro de spam (como spamassassin o j-chkmail) añade un campo de
+## cabecera, pon aquí su nombre (por ejemplo X-Spam-Status)
+antispam_tag_header_name	{{ sympa_antispam_tag_header_name }}
 
-## db_name
-## Name of the database
-## With SQLite, the name of the DB corresponds to the DB file
-db_name	{{ sympa_db_name }}
+## antispam_tag_header_spam_regexp
+## Expresión regular para revisar el campo de cabecera para marcar spam
+## Expresión regular aplicada a esta cabecera para verificar que el mensaje es
+## spam (por ejemplo, Yes)
+#antispam_tag_header_spam_regexp	^\s*Yes
+{% if sympa_antispam_tag_header_spam_regexp is defined %}
+antispam_tag_header_spam_regexp	{{ sympa_antispam_tag_header_spam_regexp }}
+{% endif %}
 
-## db_host
-## Hostname of the database server
-## Example: db_host	localhost
-db_host	{{ sympa_db_host }}
+## antispam_tag_header_ham_regexp
+## Expresión regular para determinar si es spam o ham.
+## Expresión regular aplicada a este campo de la cabecera que indica que el
+## mensaje NO es spam (por ejemplo, No)
+#antispam_tag_header_ham_regexp	^\s*No
+{% if sympa_antispam_tag_header_ham_regexp is defined %}
+antispam_tag_header_ham_regexp	{{ sympa_antispam_tag_header_ham_regexp }}
+{% endif %}
 
-## db_port
-## Port of the database server
-db_port	{{ sympa_db_port }}
+## spam_status
+## Nombre del campo de la cabecera para informar
+## Si supone que los mensajes se pasan por un filtro de spam que les añade una
+## o más cabeceras. Este parámetro se usa para seleccionar un escenario
+## especial para decidir la calidad de spam del mensaje: ham, spam o no
+## seguro. Este parámetro substituye a antispam_tag_header_name,
+## antispam_tag_header_spam_regexp y antispam_tag_header_ham_regexp.
+#spam_status	x-spam-status
+{% if sympa_spam_status is defined %}
+spam_status	{{ sympa_spam_status }}
+{% endif %}
 
-## db_user
-## User for the database connection
-## Example: db_user	sympa
-db_user	{{ sympa_db_user }}
+###\\\\ Directorios ////###
 
-## db_passwd
-## Password for the database connection
-## What ever you use a password or not, you must protect the SQL server (is it
-## not a public internet service ?)
-## Example: db_passwd	your_passwd
-db_passwd	{{ sympa_db_password }}
+## home
+## Inicio de la lista
+## Directorio base de las configuraciones de las listas.
+home	{{sympa_base_directory_home}}
 
-###\\\\ DKIM ////###
+## etc
+## Directorio para los ficheros de configuración
+## Directorio base de la configuración global (excepto "sympa.conf").
+etc	{{sympa_base_directory_etc}}
+
+## spool
+## Directorio base de las colas
+## Directorio base de todas las colas que se crean en tiempo de ejecución.
+## Este directorio tiene que ser escribible por el usuario Sympa.
+spool	{{ sympa_spool }}
+
+## queue
+## Directorio de la cola de entrada de mensajes
+## Esta cola se usa tanto por el pograma "queue" como por el proceso maestro
+## "sympa_msg.pl".
+queue	{{ sympa_queue }}
+
+## queuemod
+## Directorio para la cola de moderación
+queuemod	{{ sympa_queuemod }}
+
+## queuedigest
+## Directorio para la cola de recopilaciones
+queuedigest	{{ sympa_queuedigest }}
+
+## queueauth
+## Directorio para la cola de mensajes retenidos
+## Este parámetro se llama así por razones históricas.
+queueauth	{{ sympa_queueauth }}
+
+## queueoutgoing
+## Directorio para la cola del archivo
+## Este parámetro se llama así por razones históricas.
+queueoutgoing	{{ sympa_queueoutgoing }}
+
+## queuesubscribe
+## Directorio para la cola de solicitudes retenidas
+## Este parámetro se llama así por razones históricas.
+queuesubscribe	{{ sympa_queuesubscribe }}
+
+## queuetopic
+## Directorio para la cola de temas
+queuetopic	{{ sympa_queuetopic }}
+
+## queuebounce
+## Directorio para la cola de entrada de rechazos
+## Esta cola se usa tanto por el pograma "bouncequeue" como por el servicio
+## "bounced.pl".
+queuebounce	{{ sympa_queuebounce }}
+
+## queuetask
+## Directorio para la cola de tareas
+queuetask	{{ sympa_queuetask }}
+
+## queueautomatic
+## Directorio para la cola de creación automática de listas
+## Esta cola se usa tanto por el pograma "familyqueue" como por el servicio
+## "sympa_automatic.pl".
+queueautomatic	{{ sympa_queueautomatic }}
+
+## queuebulk
+## Directorio para la cola de salida de mensajes
+## Este parámetro se llama así por razones históricas.
+queuebulk	{{ sympa_queuebulk }}
+
+## viewmail_dir
+## Directorio para almacenar temporalmente los mensajes con formato
+## Ruta al directorio base de los directorios en los que se guardan
+## temporalmente las vistas HTML de los mensajes.
+viewmail_dir	{{ sympa_viewmail_dir }}
+
+## bounce_path
+## Directorio para almacenar rechazos
+## La ruta en la que el servicio bounced.pl almacenará el último mensaje
+## rechazado por cada usuario. Un mensaje rechazado se almacena en el fichero:
+## <bounce_path>/<list name>@<mail domain name>/<email address>, o, si el
+## seguimiento está activado: <bounce_path>/<list name>@<mail domain name>/
+## <email address>_<envelope ID>.
+## Los usuarios pueden acceder a estos mensajes desde la interfaz web, en la
+## página de gestión de rechazos.
+## No lo confundas con el parámetro "queuebounce" que define la cola en la que
+## se almacenan los informes de error entrantes, que son recogidos por el
+## servicio maestro bounced.pl.
+bounce_path	{{ sympa_bounce_path }}
+
+## arc_path
+## Directorio para almacenar archivos
+## Donde se almacenan los archivos HTML. Este parámetro se usa por el servicio
+## "archived.pl". Es una buena idea instalar el archivo fuera de la jerarquía
+## de carpetas del servidor web para evitar que se salten los sistemas de
+## control de acceso de WWSympa.
+arc_path	{{ sympa_arc_path }}
+
+###\\\\ Miscelánea ////###
+
+## email
+## Parte local de la dirección de correo de Sympa
+## Parte local (la que antecede al símbolo "@") de la dirección por la que la
+## interface de correo de Sympa acepta los comandos de correo.
+## Si cambias el valor por defecto tienes que modificar también los alias de
+## correo.
+email  {{ sympa_email }}
+
+## custom_robot_parameter
+## Parámetro personalizado del robot
+## Usado para definir parámetros personalizados en tu servidor. No olvides los
+## dos puntos (:) entre el nombre del parámetro y su valor.
+## Puedes acceder a los valores de los parámetros personalizados en las
+## plantillas web con la variable "conf.custom_robot_parameter.<param_name>"
+## Ejemplo: custom_robot_parameter	param_name ; param_value
+{% if sympa_custom_robot_parameter is defined %}
+custom_robot_parameter	{{ sympa_custom_robot_parameter }}
+{% endif %}
+
+## cache_list_config
+## Uso de la copia temporal binaria de la configuración de la lista
+## binary_file: Los procesos de Sympa mantienen una versión binaria de la
+## configuración de la lista en el fichero "config.bin" del disco local. Este
+## fichero permite el inicio más rápido de la interfaz web en las instalación
+## muy grandes (más de 1000 listas).
+## Puedes crear de nuevo esta caché ejecutanto el comando "sympa.pl --
+## reload_list_config".
+cache_list_config	{{ sympa_cache_list_config }}
+
+## logs_expiration_period
+## Edad máxima de los registros en la base de datos
+## Número de meses que transcurren antes de que caduquen los registros
+logs_expiration_period  {{ sympa_logs_expiration_period }}
+
+## Umask
+## Máscara por defecto para la creación de ficheros (ver umask(2)). Ten en
+## cuenta que se interpreta como un valor octal.
+umask  {{ sympa_umask }}
+
+## cookie
+## Cadena secreta para generar claves únicas
+## Esto permite que las claves de autenticación generadas sean diferentes de
+## un sitio a otro. También se usa para encriptar las contraseñas almacenadas
+## en la base de datos. La presencia de esta cadena es una razón por la que el
+## acceso al fichero "sympa.conf" tiene que estar restringido al usuario
+## "sympa".
+## Ten en cuenta que cambiar este parámetro hará que dejen de funcionar todas
+## las cookies HTTP almacenadas en los navegadores de los usuarios, así como
+## todas las contraseñas y las claves privadas X509 de las listas. Para
+## prevenir una catástrofe, Sympa rechaza iniciar si hubo algún cambio en este
+## parámetro.
+## Ejemplo: cookie	123456789
+#cookie	`/usr/bin/head -n1 /etc/sympa/cookie`
+cookie {{ sympa_cookie }}
+
+###\\\\ Parámetros de la interfaz web ////###
+
+## wwsympa_url
+## Prefijo de la URL de la interfaz web
+## Esto se usa para construir las URL de la interfaz web.
+## Ejemplo: wwsympa_url	https://web.example.org/sympa
+wwsympa_url	{{ sympa_wwsympa_url }}/sympa
+
+## http_host
+## Prefijo de la URL de WWSympa detrás de un proxy
+#http_host	
+{% if http_host is defined %}
+http_host     {{sympa_http_host}}
+{% endif %}
+
+## static_content_url
+## URL de los contenidos estáticos
+## El servidor HTTP tiene que relacionarlo con el directorio
+## "static_content_path".
+static_content_url	/static-sympa
+
+## static_content_path
+## Directorio para conteidos estáticos
+static_content_path	{{ sympa_static_content_path }}
+
+## log_facility
+## Servicio de registro de sistema para la interfaz web
+## Servicio de registro de sistema para WWSympa, archived.pl y bounced.pl. Por
+## defecto se usa "syslog" como valor del parámetro.
+log_facility	LOCAL1
+
+###\\\\ Parámetros de la interfaz web: aspecto ////###
+
+## default_home
+## Tipo de página web principal
+## "listas" para la página de listas de listas. "inicio" para la página de
+## inicio.
+default_home	{{ sympa_default_home }}
+
+## archive_default_index
+## Ordenación por defecto del índice del archivo web
+## hilo: Índice de conversación.
+## correo: Índice cronológico.
+archive_default_index  {{ sympa_archive_default_index }}
+
+## review_page_size
+## Tamaño de la página de revisión
+## Número líneas por defecto que se muestran con entradas de usuarios en la
+## página de revisón
+review_page_size	{{ sympa_review_page_size }}
+
+## viewlogs_page_size
+## Tamaño de la página de revisión de registros
+## Número de líneas por defecto que se muestran con entradas de registro en la
+## página de registros.
+viewlogs_page_size	{{ sympa_viewlogs_page_size}}
+
+###\\\\ Parámetros de la interfaz web: miscelánea ////###
+
+## cookie_domain
+## Dominio de validez de las cookies HTTP
+## Si empieza por un punto ("."), la cookie está disponible dentro del dominio
+## de internet especificado. En caso contrario se refiere a un servidor
+## concreto. La única razón para cambiar el valor por defecto es cuando el
+## proceso de autenticación de WWSympa es compartido con otra aplicación
+## ejecutándose en otro servidor.
+## Ejemplo: cookie_domain	.renater.fr
+cookie_domain  {{ sympa_cookie_domain }}
+
+## cookie_expire
+## Tiempo de vida de las cookies HTML
+## Este es el valor por defecto cuando no se establece de forma explícita por
+## los usuarios. "0" significa que la cookie se mantiene entre sesiones del
+## navegador.
+cookie_expire	{{ sympa_cookie_expire }}
+
+## cookie_refresh
+## Intervalo medio de refresco de la ID de sesión HTTP
+#cookie_refresh	60
+cookie_refresh	{{ sympa_cookie_refresh }}
+
+## default_shared_quota
+## Límite en disco por defecto del repositorio compartido
+#default_shared_quota	
+
+## use_html_editor
+## Usar el editor HTML
+## Si lo estableces a "on" los usuarios podrán enviar mensajes en HTML usando
+## el editor WYSIWYG en javascript.
+## Ejemplo: use_html_editor	on
+#use_html_editor	0
+
+## html_editor_url
+## URL del editor HTML
+## Ruta URL al javascript del editor HTML WYSIWYG. Ruta relativa a
+## <static_content_url> o ruta absoluta.
+## Por ejemplo, el editor TinyMCE 4 está instalado en <static_content_path>/
+## js/tinymce/.
+## Ejemplo: html_editor_url	js/tinymce/tinymce.min.js
+#html_editor_url	
+
+## html_editor_init
+## Inicialización del editor HTML
+## Fragmento javascript que habilita y configura el editor WYSIWYG HTML.
+## Ejemplo: html_editor_init	tinymce.init({selector:"#body",language:lang.split(/[^a-zA-Z]+/).join("_")});
+#html_editor_init	
+
+## max_wrong_password
+## Número límite de intentos de acceso erróneos
+## Al alcanzar este límite se bloquea la cuenta hasta que el usuario modifique
+## su contraseña. El valor por defecto se ha elegido para bloquear a los bots
+## que intentan acceder por fuerza bruta. Los usuarios reales nunca alcanzarán
+## este valor, ya que usarán el servicio de renovar la contraseña antes de
+## realizar tantos intentos.
+max_wrong_password	{{ sympa_max_wrong_password }}
+
+## password_case
+## Maiúsculas/minúsculas en la contraseña
+## "insensitive" o "sensitive".
+## Si lo ajustas a "insensitive", la comprobación de contraseñas de Sympa será
+## insensible al uso de mayúculas. Esto solo afecta a las contraseñas
+## almacenadas en la base de datos de Sympa, no a las de LDAP.
+## No lo deberías cambiar! Puede anular todas las contraseñas de los usuarios.
+#password_case	insensitive
+
+## password_hash
+## Algoritmo de ofuscamiento de contraseñas
+## "md5" o "bcrypt".
+## Si lo ajustas a "md5" Sympa ofusca las contraseñas con MD5. Se lo ajustas a
+## "bcrypt", el ofuscamiento será con bcrypt. Esto solo afecta a las
+## contraseñas almacenadas en la base de datos de Sympa, no a aquellas
+## almacenadas en LDAP.
+## No se debería modificar! Podría invalidar las contraseñas de todos los
+## usuarios.
+#password_hash	md5
+
+## password_hash_update
+## Actualiza el algoritmo de ofuscamiento de la contraseña cuando el usuario
+## acceda
+## Al acceder actualiza la contraseña ofuscada usando el algoritmo
+## especificado en "password_hash". Esto permite una transición elegante a un
+## nuevo algoritmo de ofuscamento de contraseñas. El valor 0 deshabilita la
+## actualización de las contraseñas ofuscadas. Las contraseñas nuevas y las
+## que se restablezacan a partir de este momento usarán el algoritmo
+## especificado en "password_hash".
+#password_hash_update	1
+
+## bcrypt_cost
+## Coste del ofuscamento bcrypt
+## Cuando "password_hash" está configurado a "bcrypt", este parámetro
+## establece el "coste" de la función de ofuscamento bcrypt. El valor por
+## defecto es 12 y supone que se necesitan, aproximadamente, 250 ms para
+## calcular el hash de la contraseña en una CPU de 3.2 GHz. Esto solo afecta a
+## las contraseñas almacenadas en la base de datos de Sympa, no a aquellas en
+## LDAP.
+## Puede ser cambiado, pero el nuevo ajuste de coste solo se aplica a las
+## nuevas contraseñas.
+#bcrypt_cost	12
+
+## reporting_spam_script_path
+## Script para informar de spam
+## Si lo ajustas, cuando un moderador de listas informa de mensajes de spam no
+## detectados esperando a ser moderados, se invoca este script y el mensaje es
+## reinyectado en la entrada estándar del script.
+#reporting_spam_script_path	
+
+###\\\\ S/MIME y TLS ////###
+
+## cafile
+## fichero que contiene certificados de CA de confianza
+## Esto puede usarse como alternativa o complemento de "capath".
+#cafile	
+
+## capath
+## Directorio que contiene certificados de CA de confianza
+## Los certificados CA en este directorio se usan para la autenticación de los
+## clientes.
+## Los certificados necesitan tener nombres que incluyan hashes de asunto, o
+## enlaces símbólicos a ellos con eses nombres. Las enlaces se pueden crear
+## usando el script "c_rehash" incluido con OpenSSL.
+#capath	
+
+## key_passwd
+## Contraseña usada para encriptar las claves privadas de las listas
+## Si no lo defines, Sympa asume que las claves privadas de las listas no
+## están encriptadas.
+## Ejemplo: key_passwd	your_password
+#key_passwd	
+
+## ssl_cert_dir
+## Directorio que contiene los certificados de los usuarios
+ssl_cert_dir   {{sympa_ssl_cer_dir}}
+
+###\\\\ Configuración de las fuentes de datos ////###
+
+## default_sql_fetch_timeout
+## Tiempo de inactividad por defecto de la consulta SQL
+## Tiempo de inactividad por defecto al realizar una consulta con
+## include_sql_query.
+#default_sql_fetch_timeout	300
+
+## default_ttl
+## Tiempo límite de inclusión por defecto
+## Tiempo de inactividad por defecto entre dos sincronizaciones programadas de
+## las listas de miembros con las fuentes de datos
+#default_ttl	3600
+
+###\\\\ DKIM y ARC ////###
 
 ## dkim_feature
+## Habilitar DKIM
+## Si lo ajustas a "on", Sympa puede verificar las firmas DKIM de los mensajes
+## entrantes y/o insertar una firma DKIM a los mensajes salientes.
 dkim_feature {% if sympa_dkim_feature %}on{% else %}off{% endif %}
 
 ## dkim_add_signature_to
-## Insert a DKIM signature to message from the robot, from the list or both
+## Qué mensajes de servicio se firman
+## Introduce una firma DKIM en los mensajes de servicio en el contexto de los
+## robots, listas o ambos
 dkim_add_signature_to	{{ sympa_dkim_add_signature_to | join(",") }}
 
+## dkim_private_key_path
+## Ruta al fichero de la clave privada para DKIM
+## El fichero tiene que contener una clave privada encriptada en formato PEM
+dkim_private_key_path	{{ sympa_dkim_private_key_path }}/{{sympa_domain}}/email.private
+
 ## dkim_signature_apply_on
-## Type of message that is added a DKIM signature before distribution to
-## subscribers. Possible values are "none", "any" or a list of the following
-## keywords: "md5_authenticated_messages", "smime_authenticated_messages",
-## "dkim_authenticated_messages", "editor_validated_messages".
+## Qué mensajes entregados a través de las listas se firman
+## Tipo de mensajes a los que añadir una firma DKIM antes de su distribución a
+## los suscriptores. Los posibles valores son "none", "any" o una lista de las
+## siguientes palabras clave: "md5_authenticated_messages",
+## "smime_authenticated_messages", "dkim_authenticated_messages",
+## "editor_validated_messages".
 {% if sympa_dkim_signature_apply_on | length>0 %}
 dkim_signature_apply_on {{ sympa_dkim_signature_apply_on | join(',') }}
 {% else %}
 dkim_signature_apply_on none
 {% endif %}
 
-## dkim_private_key_path
-## Location of the file where DKIM private key is stored
-dkim_private_key_path	{{ sympa_dkim_private_key_path }}
-
 ## dkim_signer_domain
-## The "d=" tag as defined in rfc 4871, default is virtual host domain name
+## La etiqueta "d=" se define en la RFC 4871
+## La etiqueta "t=" de DKIM es el dominio de la entidad firmante. Se usa el
+## dominio del host virtual como valor por defecto
 {% if sympa_dkim_signer_domain is defined %}
 dkim_signer_domain	{{ sympa_dkim_signer_domain }}
 {% endif %}
 
-## dkim_selector
-## The selector
-{% if sympa_dkim_selector is defined %}
-dkim_selector
-{% endif %}
-
 ## dkim_signer_identity
-## The "i=" tag as defined in rfc 4871, default is null
+## La etiqueta "i=" se define en la RFC 4871
+## El valor por defecto es nulo.
+#dkim_signer_identity	
 {% if sympa_dkim_signer_identity is defined %}
 dkim_signer_identity	{{ sympa_dkim_signer_identity }}
 {% endif %}
 
-###\\\\ Antivirus plug-in ////###
+## dkim_selector
+## Selector del buscador DNS de la clave pública DKIM
+## El selector se usa para construir la consulta DNS para encontrar la clave
+## pública. Depende de ti seleccionar el valor que desees, pero comprueba que
+## se puede consultar la clave pública DKIM para
+## "<selector>._domainkey.your_domain"
+{% if sympa_dkim_selector is defined %}
+dkim_selector {{sympa_dkim_selector}}
+{% endif %}	
+
+## arc_feature
+## Habilitar ARC
+## Si lo ajustas a "on", Sympa puede añadir sellos ARC a los mensajes
+## salientes.
+{% if sympa_arc_feature is defined %}
+arc_feature	{{ sympa_arc_feature }}
+{% endif %}
+
+## arc_srvid
+## ID de SRV de los Authentication-Results usados en el sello ARC
+## Normalmente el dominio del servidor de correo
+{% if sympa_arc_srvid is defined %}
+arc_srvid	{{ sympa_arc_srvid }}
+{% endif %}
+
+## arc_signer_domain
+## La etiqueta "d=" como está definida en ARC
+## La etiqueta "d=" de ARC es el dominio de la entidad firmante. Se usa el
+## nombre del dominio d= de DKIM como valor por defecto
+{% if sympa_signer_domain is defined %}
+arc_signer_domain	{{ sympa_signer_domain }}
+{% endif %}
+
+## arc_selector
+## Selector de la consulta DNS de la clave pública ARC
+## El selector se usa para construir la consulta DNS para encontrar la clave
+## pública. Depende de ti seleccionar el valor que desees, pero comprueba que
+## se puede consultar la clave pública DKIM para
+## "<selector>._domainkey.your_domain". El valor por defecto es el mismo que
+## en las firmas DKIM
+{% if sympa_arc_selector is defined %}
+arc_selector	{{ sympa_arc_selector }}
+{% endif %}
+
+## arc_private_key_path
+## Ruta al fichero de la clave privada para ARC
+## El fichero tiene que contener una clave privada encriptada en formato PEM.
+## El valor por defecto es el mismo que para la clave privada para DKIM
+{% if sympa_arc_private_key_path is defined %}
+arc_private_key_path	{{ arc_private_key_path }}
+{% endif %}
+
+###\\\\ Complemento antivirus ////###
 
 ## antivirus_path
-## Path to the antivirus scanner engine
-## supported antivirus: Clam AntiVirus/clamscan & clamdscan, McAfee/uvscan,
-## Fsecure/fsav, Sophos, AVP and Trend Micro/VirusWall
-## Example: antivirus_path	/usr/local/bin/clamscan
+## Ruta al motor de búsqueda del antivirus
+## Antivirus soportados: Clam AntiVirus/clamscan & clamdscan, McAfee/uvscan,
+## Fsecure/fsav, Sophos, AVP y Trend Micro/VirusWall
+## Ejemplo: antivirus_path	/usr/local/bin/clamscan
+#antivirus_path	
 {% if sympa_antivirus_path is defined %}
-antivirus_path
+antivirus_path {{ sympa_antivirus_path }}
 {% endif %}
 
 ## antivirus_args
-## Antivirus plugin command argument
-## Example: antivirus_args	--no-summary --database /usr/local/share/clamav
+## Argumentos de línea de comandos del complemento antivirus
+## Ejemplo: antivirus_args	--no-summary --database /usr/local/share/clamav
+#antivirus_args	
 {% if sympa_antivirus_args is defined %}
 antivirus_args	{{ sympa_antivirus_args }}
 {% endif %}
 
-###\\\\ Tag based spam filtering ////###
+###\\\\ Validación de la contraseña ////###
 
-## antispam_tag_header_name
-## If a spam filter (like spamassassin or j-chkmail) add a smtp headers to tag
-## spams, name of this header (example X-Spam-Status)
-antispam_tag_header_name	{{ sympa_antispam_tag_header_name }}
-
-## antispam_tag_header_spam_regexp
-## Regexp applied on this header to verify message is a spam (example Yes)
-{% if sympa_antispam_tag_header_spam_regexp is defined %}
-antispam_tag_header_spam_regexp	{{ sympa_antispam_tag_header_spam_regexp }}
+## password_validation
+## Validación de la contraseña
+## Las técnicas de validación de contraseña que se van usar contra las
+## contraseñas que se añadan a las listas. Las opciones provienen de
+## Data::Password
+## (http://search.cpan.org/~razinf/Data-Password-1.07/Password.pm#VARIABLES)
+## Ejemplo: password_validation	MINLEN=8,GROUPS=3,DICTIONARY=4,DICTIONARIES=/pentest/dictionaries
+{% if sympa_password_validation is defined %}
+password_validation	{{ sympa_password_validation }}
 {% endif %}
 
-## antispam_tag_header_ham_regexp
-## Regexp applied on this header to verify message is NOT a spam (example No)
-{% if sympa_antispam_tag_header_ham_regexp is defined %}
-antispam_tag_header_ham_regexp	{{ sympa_antispam_tag_header_ham_regexp }}
-{% endif %}
-
-## spam_status
-## Messages are supposed to be filtered by an antispam that add one more
-## headers to messages. This parameter is used to select a special scenario in
-## order to decide the message spam status: ham, spam or unsure. This
-## parameter replace antispam_tag_header_name, antispam_tag_header_spam_regexp
-## and antispam_tag_header_ham_regexp.
-{% if sympa_spam_status is defined %}
-spam_status	{{ sympa_spam_status }}
-{% endif %}
-
-###\\\\ Web interface parameters ////###
-
-## arc_path
-## Directory for storing HTML archives
-## Better if not in a critical partition
-arc_path	{{ sympa_arc_path }}
-
-## archive_default_index
-## Default index organization when entering the web archive: either threaded
-## or in chronological order
-archive_default_index	{{ sympa_archive_default_index }}
-
-## cookie_expire
-## HTTP cookies lifetime
-cookie_expire	{{ sympa_cookie_expire }}
-
-## cookie_domain
-## HTTP cookies validity domain
-cookie_domain	{{ sympa_cookie_domain }}
-
-## cookie_refresh
-## Average interval to refresh HTTP session ID.
-cookie_refresh	{{ sympa_cookie_refresh }}
-
-## custom_archiver
-## Activates a custom archiver to use instead of MHonArc. The value of this
-## parameter is the absolute path on the file system to the script of the
-## custom archiver.
-{% if sympa_custom_archiver is defined %}
-custom_archiver	{{ sympa_custom_archiver }}
-{% endif %}
-
-## default_home
-## Type of main Web page ( lists | home )
-default_home	{{ sympa_default_home }}
-
-## edit_list
-edit_list	{{ sympa_edit_list }}
+###\\\\ Autenticación con LDAP ////###
 
 ## ldap_force_canonical_email
-## When using LDAP authentication, if the identifier provided by the user was
-## a valid email, if this parameter is set to false, then the provided email
-## will be used to authenticate the user. Otherwise, use of the first email
-## returned by the LDAP server will be used.
-ldap_force_canonical_email	{{ sympa_ldap_force_canonical_email }}
-
-## review_page_size
-## Default number of lines of the array displaying users in the review page
-review_page_size	{{ sympa_review_page_size }}
-
-## title
-## Title of main Web page
-title	{{ sympa_web_page_title }}
-
-## use_fast_cgi
-## Is FastCGI module for HTTP server installed (0 | 1)
-## This module provide much faster web interface
-use_fast_cgi	1
-
-{% if sympa_alias_manager %}
-alias_manager {{ sympa_alias_manager }}
+## Usa una dirección de correo canónica para la autenticación LDAP
+## Cuando se usa la autenticación LDAP, si el identificador suministrado por
+## el usuario fue una dirección de correo válida, con este parámetro
+## establecido a "false", ese dirección de correo será usada para autenticar
+## al usuario. En caso contrario se usará la primera dirección de correo
+## suministrada por el servidor LDAP.
+{% if sympa_ldap_force_caninical_email is defined %}
+ldap_force_canonical_email	{{ sympa_ldap_force_caninical_email }}
 {% endif %}
 
+##Logo para reemplazar al de Sympa
+{% if sympa_logo_html_definition is defined %}
+logo_html_definition {{ sympa_logo_html_definition }}
+{% endif %}
+
+###\\\\ Parámetros obsoletos ////###
+
+## log_condition
+#log_condition	
+
+## log_module
+#log_module	
+
+## automatic_list_prefix
+## Define el prefijo que permite reconocer que una lista es automática.
+#automatic_list_prefix	
+
+## default_distribution_ttl
+## Tiempo de inactividad entre dos sincronizaciones con fuentes de datos de la
+## lista de miembros activadas por una acción.
+#default_distribution_ttl	300
+
+## voot_feature
+#voot_feature	off
+
+## edit_list
+#edit_list	owner
+
+## use_fast_cgi
+## Habilitar FastCGI
+## ¿Está instalado el módulo FastCGI en el servidor HTTP? Este módulo facilita
+## una interfaz web mucho más rápida.
+#use_fast_cgi	1
+
+## htmlarea_url
+#htmlarea_url	
+
+## show_report_abuse
+## Añadir un enlace "Informar de abuso" al menú lateral de las listas (0|1)
+## El enlace es del tipo mailto, puedes cambiarlo modificando web_tt2/
+## report_abuse.tt2
+#show_report_abuse	0
+
+#css_path	/var/lib/sympa/css
+#css_url	/css-sympa
+#pictures_path	/var/lib/sympa/pictures

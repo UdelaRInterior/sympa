@@ -1,0 +1,13 @@
+---
+
+- name: Create a new database with name '{{ sympa_db_name }}'
+  mysql_db:
+    name: "{{ sympa_db_name }}"
+    encoding: utf8
+
+- name: Create DB user '{{ sympa_db_user }}'
+  mysql_user:
+    name: "{{ sympa_db_user }}"
+    password: "{{ sympa_db_password | mandatory }}"
+    priv: '{{ sympa_db_name }}.*:ALL,GRANT'
+  no_log: True

@@ -1,0 +1,49 @@
+## This is a sample Virtual Host definition for Sympa
+## Once adapted, this file should installed in vhost
+## subdirectory in Sympa configuration directory. You'll
+## have to create a corresponding vhost subdirectory in
+## Sympa state directory.
+
+## Check the documentation related to virtual hosting on http://www.sympa.org
+
+# Sacado de http://www.sympa.org/manual/dkim
+dkim_feature    on
+dkim_add_signature_to   list,robot
+dkim_signature_apply_on md5_authenticated_messages,smime_authenticated_messages, dkim_authenticated_messages,editor_validated_messages
+dkim_private_key_path   /etc/opendkim/keys/{{ item.robot}}/email.private
+dkim_signer_domain      {{ item.robot }}
+dkim_selector   email
+dkim_signer_identity    none
+dmarc_protection_mode dmarc_reject
+
+## This hostname will be compared with 'SERVER_NAME' ENV var in wwsympa.fcgi
+## To deduce which Virtual Robot is being queried
+http_host  {{ item.robot }}
+
+## Listmasters email addresses
+
+listmaster	{{ item.listmaster | join(",") }}
+
+## Title for the ML service
+## It is displayed as a title in the web interface
+title {{ item.title }}
+
+# create_list  listmaster
+
+## The default action when entering the web interface
+## Can be 'lists', 'home' or 'which'
+default_home  {{ item.default_home }}
+
+## You can define custom colors for the Virtual Robot's
+## Web interface
+dark_color {{ item.dark_color }} 
+light_color {{ item.light_color }}
+selected_color {{ item.selected_color }}
+
+### Configuraciones adicionales sl.edu.uy
+logo_html_definition {{ item.logo_html_definition }}
+
+
+
+# Added by upgrade from 
+http_host	{{ item.robot }}

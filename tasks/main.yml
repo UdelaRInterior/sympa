@@ -1,8 +1,28 @@
-- name: Set database to mysql
+
+- name: install PostgreSQL
+  include: postgresql.yml
+  when: sympa_db_restore and sympa_db_type == 'PostgreSQL'
+
+- name: install MySQL
+  include: mysql.yml
+  when: sympa_db_restore and sympa_db_type == 'mysql'
+
+- name: Add a 'sympa' group 
+  group: 
+    name: sympa
+    state: present 
+
+- name: Create user sympa
+  user:
+    name: sympa
+    shell: /bin/bash
+    groups: sympa
+
+- name: Set database 
   debconf:
     name: sympa
     question: sympa/database-type
-    value: mysql
+    value: "{{sympa_db_type}}"
     vtype: select
 
 - name: Set webserver to other
@@ -20,22 +40,20 @@
     vtype: boolean
   changed_when: false
 
-- name: Create a new database with name '{{ sympa_db_name }}'
-  mysql_db:
-    name: "{{ sympa_db_name }}"
-    encoding: utf8
-
-- name: Create DB user '{{ sympa_db_user }}'
-  mysql_user:
-    name: "{{ sympa_db_user }}"
-    password: "{{ sympa_db_password | mandatory }}"
-    priv: '{{ sympa_db_name }}.*:ALL,GRANT'
-  no_log: True
+- name: Create mailname
+  template:
+    src: mailname.j2
+    dest: /etc/mailname
+    mode: 0600
 
 - name: Create sympa dir
   file:
-    path: "/etc/sympa/sympa"
+    path: "{{item}}"
     state: directory
+  with_items:
+    - /etc/sympa
+    - /etc/mail
+    - /etc/sympa/sympa
 
 - name: Create sympa.conf
   template:
@@ -44,21 +62,105 @@
     mode: 0600
   notify: Restart sympa
 
+#####################################################
+# Changes to fix a sympa package error in Debian 9  #
+
+- name: configure dpkg
+  template: 
+    src: dpkg.cfg.j2
+    dest: "/etc/dpkg/dpkg.cfg"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install sympa
+  apt:
+    state: present 
+    update_cache: yes 
+    cache_valid_time: 3600
+    name: sympa
+  ignore_errors: yes
+
+- name: Delete erroneous files
+  shell: 'rm -f {{item}}'
+  with_items: 
+    - /var/lib/dpkg/info/sympa.post*
+    - /var/lib/dpkg/info/sympa.pre*
+
+#####################################################
+
 - name: Install packages
   apt:
+    state: present 
+    update_cache: yes 
+    cache_valid_time: 3600
     name:
-      - sympa
+      - postfix
       - fcgiwrap
+      - apache2
+      - sendemail
+      - perl 
+      - build-essential 
+      - libssl-dev
+      - libmime-lite-html-perl
+      - libapache2-mod-fcgid
+      - cpanminus
+
+- name: configure apache2
+  include: apache2.yml
+
+- name: Create robots dir
+  file:
+    path: "/etc/sympa/{{item.robot}}"
+    state: directory
+  with_items: "{{sympa_robots}}"
 
 - name: Fix permissions
   file:
-    path: "/etc/sympa/{{ item }}"
+    path: "/etc/sympa"
     owner: sympa
     group: sympa
-  loop:
-    - ""
-    - "sympa/"
-    - "sympa/sympa.conf"
+    recurse: yes
+
+- name: Create auth.conf
+  template:
+    src: auth.conf.j2
+    dest: /etc/sympa/auth.conf
+    owner: sympa
+    group: sympa
+    mode: 0600
+  notify: Restart sympa
+
+- name: Create topics.conf
+  template:
+    src: topics.conf.j2
+    dest: /etc/sympa/topics.conf
+    owner: sympa
+    group: sympa
+    mode: 0600
+  notify: Restart sympa
+
+- name: Create topics.robots.conf
+  template:
+    src: topics.robot.conf.j2
+    dest: /etc/sympa/{{ item.robot }}/topics.conf
+    owner: sympa
+    group: sympa
+    mode: 0600
+  when: '{{item.topics is defined}}'
+  with_items: '{{ sympa_robots }}'
+  notify: Restart sympa
+
+- name: Create robots
+  template: 
+    src: robot.conf.j2
+    dest: "/etc/sympa/{{item.robot}}/robot.conf"
+    owner: sympa
+    group: sympa
+    mode: 0600
+  when: '{{sympa_robots != ""}}'
+  with_items: '{{sympa_robots}}'
+
 
 - name: Create ldap_alias_manager.conf
   template:
@@ -86,6 +188,7 @@
     owner: sympa
     group: sympa
   loop: "{{ sympa_template_lists }}"
+  when: sympa_template_lists is defined
 
 - name: Create comment.tt2 for list templates
   copy:
@@ -95,6 +198,7 @@
     group: sympa
     mode: 0600
   loop: "{{ sympa_template_lists }}"
+  when: sympa_template_lists is defined
 
 - name: Create comment.tt2 for list templates
   copy:
@@ -104,6 +208,7 @@
     group: sympa
     mode: 0600
   loop: "{{ sympa_template_lists }}"
+  when: sympa_template_lists is defined
 
 - name: Disable default templates
   lineinfile:
@@ -127,14 +232,14 @@
     state: absent
   when: sympa_show_default_templates
   loop:
+    - hotline
+    - news-letter
     - confidential
     - discussion_list
     - html-news-letter
     - intranet_list
     - private_working_group
     - public_web_forum
-    - hotline
-    - news-letter
 
 - name: Create datasources
   copy:
@@ -144,21 +249,4 @@
     group: sympa
     mode: 0600
   loop: "{{ sympa_data_sources }}"
-
-- name: Create auth.conf
-  template:
-    src: auth.conf.j2
-    dest: /etc/sympa/auth.conf
-    owner: sympa
-    group: sympa
-    mode: 0600
-  notify: Restart sympa
-
-- name: Create topics.conf
-  template:
-    src: topics.conf.j2
-    dest: /etc/sympa/topics.conf
-    owner: sympa
-    group: sympa
-    mode: 0600
-  notify: Restart sympa
+  when: sympa_data_sources is defined

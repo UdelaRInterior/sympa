@@ -1,0 +1,17 @@
+#
+# Apache >> 2.4 configuration for Sympa
+#
+
+<IfModule mod_fcgid.c>
+
+    Alias /static-sympa /var/lib/sympa/static_content
+    <Directory /var/lib/sympa/static_content>
+        Require all granted
+    </Directory>
+
+    ScriptAlias /sympa /usr/lib/cgi-bin/sympa/wwsympa-wrapper.fcgi
+    <Directory /usr/lib/cgi-bin/sympa>
+        Require all granted
+    </Directory>
+
+</IfModule>

@@ -1,36 +1,50 @@
 ---
-sympa_show_default_templates: false
-sympa_template_lists: []
-sympa_ldap_alias_manager_conf:
-  mail_attribute: mailRoutingAddress
-  ssl: true
-  queue_transport: sympa
-  bouncequeue_transport: sympabounce
+sympa_wwsympa_url: 'https://domain.tls'
+sympa_http_host: 'http://domain.tls'
+sympa_db_type: PostgreSQL   # PostgreSQL / mysql
 sympa_db_name: sympa
 sympa_db_host: localhost
-sympa_db_port: 3306
+sympa_db_port: 5432
 sympa_db_user: sympa
+sympa_db_restore: true
+sympa_supported_lang: 'ca,cs,de,el,en-US,es,et,eu,fi,fr,gl,hu,it,ja,ko,nb,nl,oc,pl,pt-BR,ru,sv,tr,vi,zh-CN,zh-TW'
 sympa_lang: en
 sympa_auth:
+  - name: ldap
+    options:
+      host: ldap.example.com:636
+      timeout: 20
+      suffix: yoursuffix
+      bind_dn: yourbinddn
+      bind_password: yourpw
+      use_tls: ldaps
+      ca_verify: none
+      get_dn_by_uid_filter: "(uid=[sender])"
+      email_attribute: mail
+      scope: sub
+      authentication_info_url: https://example.com
   - name: user_table
     options:
       regexp: ".*"
 sympa_topics:
   - path: art
     title: Arts
+sympa_server_admin: admin@domain.tls
 sympa_email: sympa
 sympa_gecos: SYMPA
 sympa_process_archive: False
-sympa_voot_feature: False
 sympa_max_wrong_password: 19
 sympa_static_content_path: /var/lib/sympa/static_content
 sympa_static_content_url: /static-sympa
 sympa_syslog: LOCAL1
 sympa_log_level: 0
 sympa_log_socket_type: unix
-sympa_sendmail: /usr/bin/sendmail
+sympa_logs_expiration_period:  3
+sympa_umask: 027
+sympa_sendmail: /usr/sbin/sendmail
 sympa_maxsmtp: 40
 sympa_log_smtp: False
+sympa_create_list: public_listmaster
 sympa_use_blacklist:
   - send
   - create_list
@@ -54,6 +68,7 @@ sympa_remove_headers:
   - Notification-To
   - Sender
 sympa_reject_mail_from_automates_feature: True
+sympa_ssl_cer_dir: /var/lib/sympa/list_data/X509-user-certs
 sympa_packet_priority: 5
 sympa_bulk_fork_threshold: 1
 sympa_bulk_max_count: 3
@@ -61,6 +76,8 @@ sympa_bulk_lazytime: 600
 sympa_bulk_sleep: 1
 sympa_bulk_wait_to_fork: 10
 sympa_default_max_list_members: 0
+sympa_antispam_tag_header_spam_regexp: '^\s*Yes'
+sympa_antispam_tag_header_ham_regexp: '^\s*No'
 sympa_spool: /var/spool/sympa
 sympa_queue: /var/spool/sympa/msg
 sympa_queuemod: /var/spool/sympa/moderation
@@ -84,12 +101,13 @@ sympa_cache_list_config: none
 sympa_sympa_priority: 1
 sympa_request_priority: 0
 sympa_owner_priority: 9
+sympa_path_mhonarc: /usr/bin/mhonarc
 sympa_default_list_priority: 5
 sympa_parsed_family_files:
-  - message.footer
-  - message.header
-  - message.footer.mime
-  - message.header.mime
+  - message_header
+  - message_header.mime
+  - message_footer
+  - message_footer.mime
   - info
 sympa_dkim_feature: False
 sympa_dkim_add_signature_to:
@@ -104,11 +122,17 @@ sympa_dkim_signature_apply_on:
 sympa_antispam_tag_header_name: X-Spam-Status
 sympa_arc_path: /var/lib/sympa/arc
 sympa_archive_default_index: thrd
+sympa_cookie: "`cat /etc/sympa/cookie`"
 sympa_cookie_expire: 0
 sympa_cookie_domain: localhost
 sympa_cookie_refresh: 60
 sympa_default_home: home
+sympa_base_directory_home: /var/lib/sympa/list_data
+sympa_base_directory_etc: /etc/sympa
 sympa_edit_list: owner
 sympa_ldap_force_canonical_email: 1
-sympa_review_page_size: 25
 sympa_web_page_title: Mailing lists service
+sympa_review_page_size: 25
+sympa_viewlogs_page_size: 25
+sympa_show_default_templates: true
+sympa_robots: ''

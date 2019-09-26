@@ -1,11 +1,11 @@
 # sympa
-This is an Ansible role which sets up a sympa
-
+This Ansible role configures Sympa and exposes the lists with Apache, also installing dkim certificates and configuring SSL.
 
 ## Requirements
 
-Debian or Ubuntu with a webserver that serves the sympa web app and a mysql database for it.
-
+Debian or Ubuntu with a webserver that serves the sympa web app and a PostgreSQL database or Mysql for it.
+Certbot to create certificates SSL. Download from the galaxy https://galaxy.ansible.com/geerlingguy/certbot
+Opendkim to create certificates dkim. Download from the galaxy https://galaxy.ansible.com/udelarinterior/opendkim
 
 ## Role Variables
 
@@ -63,21 +63,21 @@ Each entry consists of the following:
 ```yaml
 sympa_auth:
 - name: ldap
-options:
-  host: ldap.example.com:636
-  timeout: 20
-  suffix: yoursuffix
-  bind_dn: yourbinddn
-  bind_password: yourpw
-  use_tls: ldaps
-  ca_verify: none
-  get_dn_by_uid_filter: "(uid=[sender])"
-  email_attribute: mail
-  scope: sub
-  authentication_info_url: https://example.com
+  options:
+    host: ldap.example.com:636
+    timeout: 20
+    suffix: yoursuffix
+    bind_dn: yourbinddn
+    bind_password: yourpw
+    use_tls: ldaps
+    ca_verify: none
+    get_dn_by_uid_filter: "(uid=[sender])"
+    email_attribute: mail
+    scope: sub
+    authentication_info_url: https://example.com
 - name: user_table
-options:
-  regexp: ".*"
+  options:
+    regexp: ".*"
 ```
 
 ### Topic Variables
@@ -85,21 +85,63 @@ options:
 List of topics under the key `sympa_topics`.
 Each list entry contains the following:
 
-| Name    | Required/Default   | Description           |
-|:--------|:------------------:|:----------------------|
-| `path`  | :heavy_check_mark: | Path of the category  |
-| `title` | :heavy_check_mark: | Title of the category |
+| Name         | Required/Default   | Description           |
+|:-------------|:------------------:|:----------------------|
+| `path`       | :heavy_check_mark: | Path of the category  |
+| `title`      | :heavy_check_mark: | Title of the category |
+| `visibility` | :heavy_check_mark: | noconceal / conceal   |
 
 ## Example
 
 ```yaml
 sympa_topics:
-- path: art
-title: Art
-- path: art/expressionism
-title: Expressionism
+  - path: art
+    title: Art
+    visibility: noconceal
+  - path: art/expressionism
+    title: Expressionism
+    visibility: noconceal
 ```
 
+### Robots Variables
+
+List of robots you want to create (default null).
+You can create robots with their particularities and also their own topics. If you want to use the main Sympa topics, we must eliminate the robot topics variable.
+
+## Example 
+
+```yaml
+sympa_robots:
+  - robot: lists.domain.tls
+    listmaster: 
+      - admin1@domain.tls
+      - adminsys@domain.tls
+    create_list: listmaster
+    title: 'Uruguay mailing lists'
+    default_home: home
+    dark_color: '#00aa00'
+    light_color: '#ddffdd'
+    selected_color: '#0099cc'
+    logo_html_definition: 
+    topics:
+      - path: art
+        title: Arts & Humanities
+        visibility: noconceal
+      - path: art/literature
+        title: Literature
+        visibility: noconceal
+  - robot: lists.otherdomain.tls
+    listmaster: 
+      - admin1@domain.tls
+      - adminsys@domain.tls
+    create_list: listmaster
+    title: 'Japan mailing lists'
+    default_home: home
+    dark_color: '#00aa00'
+    light_color: '#ddffdd'
+    selected_color: '#0099cc'
+    logo_html_definition: 
+```
 ### Sympa Variables
 
 | Name                                       | Required/Default                                                                                                      | Description                                                                                                                                                                                                                                                                                                                              |
@@ -107,11 +149,13 @@ title: Expressionism
 | `sympa_domain`                             | :heavy_check_mark:                                                                                                    | Main robot hostname                                                                                                                                                                                                                                                                                                                      |
 | `sympa_listmaster`                         | :heavy_check_mark:                                                                                                    | List of email address to promote to listmaster                                                                                                                                                                                                                                                                                           |
 | `sympa_wwsympa_url`                        | :heavy_check_mark:                                                                                                    | URL of main Web page                                                                                                                                                                                                                                                                                                                     |
+| `sympa_db_type`                            | `PostgreSQL`                                                                                                          | Database type PostgreSQL or mysql                                                                                                                                                                                                                                                                                                        |
+| `sympa_db_restore`                         | `True`                                                                                                                | Flag. Create or restore database                                                                                                                                                                                                                                                                                                         |
 | `sympa_email`                              | :heavy_multiplication_x:                                                                                              | Local part of sympa email address                                                                                                                                                                                                                                                                                                        |
 | `sympa_db_password`                        | :heavy_check_mark:                                                                                                    | Password for the database connection                                                                                                                                                                                                                                                                                                     |
 | `sympa_db_name`                            | `sympa`                                                                                                               | Name of the database                                                                                                                                                                                                                                                                                                                     |
 | `sympa_db_host`                            | `localhost`                                                                                                           | Hostname of the database server                                                                                                                                                                                                                                                                                                          |
-| `sympa_db_port`                            | `3306`                                                                                                                | Port of the database server                                                                                                                                                                                                                                                                                                              |
+| `sympa_db_port`                            | `5432`                                                                                                                | Port of the database server                                                                                                                                                                                                                                                                                                              |
 | `sympa_db_user`                            | `sympa`                                                                                                               | User for the database connection                                                                                                                                                                                                                                                                                                         |
 | `sympa_lang`                               | `en`                                                                                                                  | Default language (one of supported languages)#supported_lang	ca,cs,de,el,es,et,en-US,fr,fi,hu,it,ja,ko,nl,nb,oc,pl,pt-BR,ru,sv,tr,vi,zh-CN,zh-TW                                                                                                                                                                                      |
 | `sympa_logo_html_definition`               | :heavy_multiplication_x:                                                                                              | HTML snippet to place logo in upper left corner                                                                                                                                                                                                                                                                                          |
@@ -124,7 +168,7 @@ title: Expressionism
 | `sympa_syslog`                             | `LOCAL1`                                                                                                              | Syslog facility for sympa                                                                                                                                                                                                                                                                                                                |
 | `sympa_log_level`                          | `0`                                                                                                                   | Log verbosity  0: normal, 2,3,4: for debug                                                                                                                                                                                                                                                                                               |
 | `sympa_log_socket_type`                    | `unix`                                                                                                                | Communication mode with syslogd (unix,inet)                                                                                                                                                                                                                                                                                              |
-| `sympa_sendmail`                           | `/usr/bin/sendmail`                                                                                                   | Path to the MTA (sendmail, postfix, exim or qmail)  should point to a sendmail-compatible binary (eg: a binary named "sendmail"  is distributed with Postfix)                                                                                                                                                                            |
+| `sympa_sendmail`                           | `/usr/sbin/sendmail`                                                                                                   | Path to the MTA (sendmail, postfix, exim or qmail)  should point to a sendmail-compatible binary (eg: a binary named "sendmail"  is distributed with Postfix)                                                                                                                                                                            |
 | `sympa_maxsmtp`                            | `40`                                                                                                                  | Max. number of Sendmail processes (launched by Sympa) running                                                                                                                                                                                                                                                                            |
 | `sympa_log_smtp`                           | `False`                                                                                                               |                                                                                                                                                                                                                                                                                                                                          |
 | `sympa_use_blacklist`                      | `[ send, create_list ]`                                                                                               | List of operations for which blacklist filter is applied . An empty list will disable the feature.                                                                                                                                                                                                                                       |
@@ -190,10 +234,10 @@ title: Expressionism
 | `sympa_ldap_force_canonical_email`         | `1`                                                                                                                   | When using LDAP authentication, if the identifier provided by the user was  a valid email, if this parameter is set to false, then the provided email  will be used to authenticate the user. Otherwise, use of the first email  returned by the LDAP server will be used.                                                               |
 | `sympa_review_page_size`                   | `25`                                                                                                                  | Default number of lines of the array displaying users in the review page                                                                                                                                                                                                                                                                 |
 | `sympa_web_page_title`                     | `Mailing lists service`                                                                                               | Title of main Web page                                                                                                                                                                                                                                                                                                                   |
-| `sympa_show_default_templates`             | `false`                                                                                                               | Show or hide the default list templates                                                                                                                                                                                                                                                                                                  |
-| `sympa_template_lists`                     | `[]`                                                                                                                  | List of templates to be defined.                                                                                                                                                                                                                                                                                                         |
 | `sympa_data_sources`                       | `false`                                                                                                               | List of data sources to be defined.                                                                                                                                                                                                                                                                                                      |
 | `sympa_alias_manager`                      | ``                                                                                                                    | Path to the alias manager executable.                                                                                                                                                                                                                                                                                                    |
+| `sympa_show_default_templates`             | `true`                                                                                                                | Enable default templates.                                                                                                                                                                                                                                                                                                                |
+
 | `sympa_ldap_alias_entry`                   | ``                                                                                                                    | Multiline string, written to `/etc/sympa/ldap_alias_entry.tt2`.                                                                                                                                                                                                                                                                          |
 | `sympa_ldap_alias_manager_conf`            | ``                                                                                                                    | Dict containing alias manager config attributes                                                                                                                                                                                                                                                                                          |
 | `sympa_auth`                               | `[{ name: "user:table", options: {regexp: ".*"}}]`                                                                    | List of auth methods used in order.                                                                                                                                                                                                                                                                                                      |

@@ -1,4 +1,4 @@
-{% for topic in sympa_topics %}
+{% for topic in item.topics %}
 {{ topic.path }}
 title {{ topic.title }}
 {% if topic.visibility %}
@@ -6,3 +6,5 @@ visibility {{topic.visibility}}
 
 {% endif %}
 {% endfor %}
+
+
