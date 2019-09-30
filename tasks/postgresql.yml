@@ -11,7 +11,7 @@
       - libpq-dev
       - python-psycopg2
   tags: postgresql
- 
+
 - name: Create database
   become: true
   become_user: postgres
