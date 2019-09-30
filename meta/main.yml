@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: sympa
   author: Janne Heß (@helsinki-systems) - Victor Torterola (@tricovictor)
   description: Install and configure Sympa
   company: stuvus (https://stuvus.uni-stuttgart.de) - Red Unidades Informáticas UdelaR Interior (@UdelaRInterior)
