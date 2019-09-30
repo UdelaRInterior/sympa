@@ -1,8 +1,8 @@
 {% for topic in item.topics %}
 {{ topic.path }}
 title {{ topic.title }}
-{% if topic.visibility %}
+{% if topic.visibility is defined %}
 visibility {{topic.visibility}}
-
 {% endif %}
+
 {% endfor %}
