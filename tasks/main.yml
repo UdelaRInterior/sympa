@@ -141,7 +141,7 @@
     mode: 0600
   notify: Restart sympa
 
-- name: Create topics.robots.conf
+- name: Create topics robots
   template:
     src: topics.robot.conf.j2
     dest: /etc/sympa/{{ item.robot }}/topics.conf
@@ -155,11 +155,11 @@
 - name: Create robots
   template:
     src: robot.conf.j2
-    dest: "/etc/sympa/{{item.robot}}/robot.conf"
+    dest: "/etc/sympa/{{ item.robot }}/robot.conf"
     owner: sympa
     group: sympa
     mode: 0600
-  when: '{{ sympa_robots != "" }}'
+  when: '{{ sympa_robots }}'
   with_items: '{{ sympa_robots }}'
 
 

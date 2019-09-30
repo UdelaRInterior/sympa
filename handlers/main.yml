@@ -2,13 +2,12 @@
 
 - name: Restart sympa
   service:
-    name: sympa 
+    name: sympa
     enabled: yes
-    state: restarted 
+    state: restarted
 
 - name: Restart apache2
   service:
     name: apache2
     enabled: yes
     state: restarted
-

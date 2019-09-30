@@ -3,7 +3,7 @@
 - name: Add module
   apache2_module:
     state: present
-    name: "{{item}}"
+    name: "{{ item }}"
   with_items:
     - rewrite
     - ssl
@@ -22,7 +22,7 @@
 
 - name: Copy apache config ssl
   template:
-    dest: "/etc/apache2/sites-available/{{item.robot}}.conf"
+    dest: "/etc/apache2/sites-available/{{ item.robot }}.conf"
     src: apache/sympa-robot-ssl.conf.j2
     owner: root
     group: root
@@ -48,13 +48,13 @@
 
 - name: Activate apache site robots.
   file:
-    path: "/etc/apache2/sites-enabled/{{item.robot}}.conf"
-    src: "/etc/apache2/sites-available/{{item.robot}}.conf"
+    path: "/etc/apache2/sites-enabled/{{ item.robot }}.conf"
+    src: "/etc/apache2/sites-available/{{ item.robot }}.conf"
     state: link
   notify: restart apache2
   with_items: "{{ sympa_robots }}"
 
-- name: Copy apache config wwsympa 
+- name: Copy apache config wwsympa
   template:
     dest: "/etc/apache2/conf-available/sympa.conf"
     src: apache/sympa.conf.j2
