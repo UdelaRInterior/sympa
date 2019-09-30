@@ -4,7 +4,7 @@
   apache2_module:
     state: present
     name: "{{item}}"
-  with_items: 
+  with_items:
     - rewrite
     - ssl
     - suexec
@@ -27,12 +27,12 @@
     owner: root
     group: root
     mode: "0644"
-  with_items: "{{sympa_robots}}"
+  with_items: "{{ sympa_robots }}"
   notify: restart apache2
 
 - name: Remove default apache2 site.
   file:
-    path: "{{item}}"
+    path: "{{ item }}"
     state: absent
   notify: restart apache2
   with_items:
@@ -52,9 +52,9 @@
     src: "/etc/apache2/sites-available/{{item.robot}}.conf"
     state: link
   notify: restart apache2
-  with_items: "{{sympa_robots}}"
+  with_items: "{{ sympa_robots }}"
 
-- name: Copy apache config wwsympa
+- name: Copy apache config wwsympa 
   template:
     dest: "/etc/apache2/conf-available/sympa.conf"
     src: apache/sympa.conf.j2
@@ -71,7 +71,7 @@
   notify: restart apache2
 
 - name: symbolic link to sympa
-  file: 
+  file:
     path: "/var/www/sympa"
     src: "/usr/lib/cgi-bin/sympa"
     state: link

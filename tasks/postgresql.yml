@@ -1,8 +1,9 @@
+---
 
 - name: Install PostgreSQL
   apt:
-    state: present 
-    update_cache: yes 
+    state: present
+    update_cache: yes
     cache_valid_time: 3600
     name:
       - postgresql
@@ -14,8 +15,8 @@
 - name: Create database
   become: true
   become_user: postgres
-  postgresql_db: 
-    name: "{{sympa_db_name}}"
+  postgresql_db:
+    name: "{{ sympa_db_name }}"
     encoding: UTF-8
     lc_collate: es_UY.UTF-8
     lc_ctype: es_UY.UTF-8
@@ -26,16 +27,16 @@
 - name: user has access to the database
   become: true
   become_user: postgres
-  postgresql_user: 
-    db: "{{sympa_db_name}}"
-    name: "{{sympa_db_user}}"
-    password: "{{sympa_db_password | mandatory}}"
+  postgresql_user:
+    db: "{{ sympa_db_name }}"
+    name: "{{ sympa_db_user }}"
+    password: "{{ sympa_db_password | mandatory }}"
     priv: ALL
     state: present
   tags: postgresql
 
 - name: PostgreSQL service is running
-  service: 
+  service:
     name: postgresql
     state: started
     enabled: yes

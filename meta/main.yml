@@ -1,23 +1,26 @@
 ---
 galaxy_info:
-  author: Insert author(s) here
-  description: Insert description here
-  company: stuvus (https://stuvus.uni-stuttgart.de)
+  author: Janne Heß (@helsinki-systems) - Victor Torterola (@tricovictor)
+  description: Install and configure Sympa
+  company: stuvus (https://stuvus.uni-stuttgart.de) - Red Unidades Informáticas UdelaR Interior (@UdelaRInterior)
 
   license: CC-BY-SA
 
-  min_ansible_version: 2.2
+  ansible_version: 2.8
 
   platforms:
     - name: Ubuntu
       versions:
-        - yakkety
+        - bionic
     - name: Debian
       versions:
-        - jessie
+        - stretch
 
   galaxy_tags:
     - stuvus
-    - Insert ansible galaxy tags here
+    - sympa
+    - lists
+    - debian
+    - sysadmin
 
 dependencies: []

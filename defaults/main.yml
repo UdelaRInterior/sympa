@@ -1,7 +1,8 @@
 ---
 sympa_wwsympa_url: 'https://domain.tls'
 sympa_http_host: 'http://domain.tls'
-sympa_db_type: PostgreSQL   # PostgreSQL / mysql
+# PostgreSQL / mysql
+sympa_db_type: PostgreSQL
 sympa_db_name: sympa
 sympa_db_host: localhost
 sympa_db_port: 5432
