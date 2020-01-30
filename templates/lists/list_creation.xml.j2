@@ -39,7 +39,7 @@
         <user>{{ list.sql.user }}</user>
         <pwd>{{ list.sql.pwd }}</pwd>
         <name>{{ list.sql.name }}</name>
-        <env>{{ list.sql.env | default(omit) }}</env>
+        <env>{{ list.sql.env | default(omiqt) }}</env>
         <query>{{ list.sql.query }}</query>
     </sql>
    {% endif %}
