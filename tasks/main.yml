@@ -1,11 +1,11 @@
 ---
 
 - name: install PostgreSQL
-  include: postgresql.yml
+  import_tasks: postgresql.yml
   when: sympa_db_restore and sympa_db_type == 'PostgreSQL'
 
 - name: install MySQL
-  include: mysql.yml
+  import_tasks: mysql.yml
   when: sympa_db_restore and sympa_db_type == 'mysql'
 
 - name: Add a 'sympa' group
@@ -102,7 +102,7 @@
       - cpanminus
 
 - name: configure apache2
-  include: apache2.yml
+  import_tasks: apache2.yml
 
 - name: Create robots dir
   file:
@@ -245,3 +245,8 @@
     mode: 0600
   loop: "{{ sympa_data_sources }}"
   when: sympa_data_sources is defined
+
+- name: Lists creation and management
+  import_tasks: manage_lists.yml
+  tags: 
+  - sympa:lists

@@ -1,0 +1,19 @@
+---
+## List creation and management with ansible
+
+- name: Create a folder for ansible in remote server
+  file: 
+    path: ansible
+    state: directory
+    mode: 0755
+
+- name: Create XML data template for defined lists
+#  debug: 
+#    var: list
+  template:
+    src: lists/list_creation.xml.j2
+    dest: "ansible/{{ list.name }}.xml"
+  loop: "{{ sympa_lists }}"
+  loop_control: 
+    loop_var: list
+...

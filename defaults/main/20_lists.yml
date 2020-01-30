@@ -1,0 +1,38 @@
+---
+## variables to create lists through ansible
+sympa_lists: []
+#  See: https://sympa-community.github.io/manual/admin/list-creation.html
+# sympa_lists:
+# - name: my_list
+#   type: $DEFAULTDIR/create_list_templates/discussion_list/config.tt2
+#   subject: subject of the list
+#   description: description of the list
+#   status: open
+#   shared_edit: editor
+#   shared_read: private
+#   language: es
+#   owners:
+#   - email: 
+#     gcos:                       # Name
+#   - email: 
+#     gcos:
+#   owner_includes:               # Dinamically defined
+#   - my_file                       
+#   editors:
+#   - email: 
+#     gcos:                       # Name
+#   - email: 
+#     gcos:                       # Name
+#   editors_includes: 
+#   - 
+#   topic:  
+#   sql:
+#     type: 
+#     host: 
+#     port:
+#     user: 
+#     pwd: 
+#     name: 
+#     env: 
+#     query:                       # SELECT DISTINCT email FROM etudiant</query>
+...

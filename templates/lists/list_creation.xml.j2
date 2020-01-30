@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<list>
+    <listname>{{ list.name }}</listname>
+    <type>{{ list.type }}</type>
+    <subject>{{ list.subject }}</subject>
+    <description>{{ list.description }}</description>
+    <status>{{ list.status | default('open') }}</status>
+    <shared_edit>{{ list.shared_edit | default('editor') }}</shared_edit>
+    <shared_read>{{ list.shared_read | default('private') }}</shared_read>
+    <language>{{ list.language | default('en') }}fr</language>
+    {% if list.owners is defined %}
+    {% for owner in list.owners %}
+    <owner multiple="1">
+        <email>{{ owner.email }}</email>
+        <gecos>{{ owner.gcos }}</gecos>
+    </owner>
+    {% endfor %}
+    {% endif %}
+    {% if list.owner_includes is defined %}
+    {% for owner_include in list.owner_includes %}
+    <owner_include multiple="1">
+        <source>{{ owner_include }}</source>
+    </owner_include>
+    {% endfor %}
+    {% endif %}
+    {% if list.editors is defined %}
+    {% for editor in list.editors %}
+    <editor multiple="1">
+        <email>{{ editor.email }}</email>
+    </editor>
+    {% endfor %}
+    {% endif %}
+    <topic>{{ list.topic }}</topic>
+    {% if list.sql is defined %}
+    <sql>
+        <type>{{ list.sql.type }}</type>
+        <host>{{ list.sql.host }}</host>
+        <port>{{ list.sql.port }}</port>
+        <user>{{ list.sql.user }}</user>
+        <pwd>{{ list.sql.pwd }}</pwd>
+        <name>{{ list.sql.name }}</name>
+        <env>{{ list.sql.env | default(omit) }}</env>
+        <query>{{ list.sql.query }}</query>
+    </sql>
+   {% endif %}
+ </list>
