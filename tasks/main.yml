@@ -20,6 +20,16 @@
     vtype: boolean
   changed_when: false
 
+- name: Install pip (python-pip debian package)
+  apt:
+    name: python-pip
+    state: present
+
+- name: Install mysql python module
+  pip:
+    name: pymysql
+    state: present
+
 - name: Create a new database with name '{{ sympa_db_name }}'
   mysql_db:
     name: "{{ sympa_db_name }}"
