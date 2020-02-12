@@ -27,6 +27,13 @@ sympa_auth:
   - name: user_table
     options:
       regexp: ".*"
+## Define the following variables for ldap alias manager
+# sympa_ldap_alias_manager_conf:
+#  host: ldap.myhost.org
+#  mail_attribute: mailRoutingAddress
+#  ssl: true
+#  queue_transport: sympa
+#  bouncequeue_transport: sympabounce
 sympa_topics:
   - path: art
     title: Arts
