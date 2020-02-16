@@ -18,7 +18,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart apache2
+  notify: sympa - Restart apache2
 
 - name: Copy apache config ssl
   template:
@@ -28,13 +28,13 @@
     group: root
     mode: "0644"
   with_items: "{{ sympa_robots }}"
-  notify: restart apache2
+  notify: sympa - Restart apache2
 
 - name: Remove default apache2 site.
   file:
     path: "{{ item }}"
     state: absent
-  notify: restart apache2
+  notify: sympa - Restart apache2
   with_items:
     - "/etc/apache2/sites-enabled/000-default.conf"
     - "/etc/apache2/sites-enabled/000-default-ssl*"
@@ -44,14 +44,14 @@
     path: "/etc/apache2/sites-enabled/sympa-ssl.conf"
     src: "/etc/apache2/sites-available/sympa-ssl.conf"
     state: link
-  notify: restart apache2
+  notify: sympa - Restart apache2
 
 - name: Activate apache site robots.
   file:
     path: "/etc/apache2/sites-enabled/{{ item.robot }}.conf"
     src: "/etc/apache2/sites-available/{{ item.robot }}.conf"
     state: link
-  notify: restart apache2
+  notify: sympa - Restart apache2
   with_items: "{{ sympa_robots }}"
 
 - name: Copy apache config wwsympa
@@ -61,18 +61,18 @@
     owner: root
     group: root
     mode: "0600"
-  notify: restart apache2
+  notify: sympa - Restart apache2
 
 - name: Activate apache conf.
   file:
     path: "/etc/apache2/conf-enabled/sympa.conf"
     src: "/etc/apache2/conf-available/sympa.conf"
     state: link
-  notify: restart apache2
+  notify: sympa - Restart apache2
 
 - name: symbolic link to sympa
   file:
     path: "/var/www/sympa"
     src: "/usr/lib/cgi-bin/sympa"
     state: link
-  notify: restart apache2
+  notify: sympa - Restart apache2

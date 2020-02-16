@@ -13,11 +13,11 @@
     name: sympa
     state: present
 
-- name: Create user sympa
-  user:
-    name: sympa
-    shell: /bin/bash
-    groups: sympa
+#- name: Create user sympa
+#  user:
+#    name: sympa
+#    shell: /bin/bash
+#    groups: sympa
 
 - name: Set database
   debconf:
@@ -33,11 +33,21 @@
     value: Other
     vtype: select
 
-- name: "Set dbconfig-install to no"
+- name: Set dbconfig-install to yes
   debconf:
     name: sympa
     question: sympa/dbconfig-install
-    value: no
+#    value: no
+    value: yes
+    vtype: boolean
+  changed_when: false
+
+- name: Set dbconfig-install to yes
+  debconf:
+    name: sympa
+    question: sympa/dbconfig-install
+#    value: no
+    value: yes
     vtype: boolean
   changed_when: false
 
@@ -47,21 +57,21 @@
 #    dest: /etc/mailname
 #    mode: 0600
 
-- name: Create sympa dir
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - /etc/sympa
-    - /etc/mail
-    - /etc/sympa/sympa
+#- name: Create sympa dir
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#  with_items:
+#    - /etc/sympa
+#    - /etc/mail
+#    - /etc/sympa/sympa
 
-- name: Create sympa.conf
-  template:
-    src: sympa.conf.j2
-    dest: /etc/sympa/sympa/sympa.conf
-    mode: 0600
-  notify: Restart sympa
+#- name: Create sympa.conf
+#  template:
+#    src: sympa.conf.j2
+#    dest: /etc/sympa/sympa/sympa.conf
+#    mode: 0600
+#  notify: Restart sympa
 
 #####################################################
 # Changes to fix a sympa package error in Debian 9  #
@@ -141,7 +151,7 @@
     owner: sympa
     group: sympa
     mode: 0600
-  when: '{{ item.topics is defined }}'
+  when: item.topics is defined
   with_items: '{{ sympa_robots }}'
   notify: Restart sympa
 
@@ -152,7 +162,7 @@
     owner: sympa
     group: sympa
     mode: 0600
-  when: '{{ sympa_robots }}'
+  when: sympa_robots
   with_items: '{{ sympa_robots }}'
 
 

@@ -12,6 +12,13 @@
       - python-psycopg2
   tags: postgresql
 
+- name: PostgreSQL service is running
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+  tags: postgresql
+
 - name: Create database
   become: true
   become_user: postgres
@@ -35,9 +42,25 @@
     state: present
   tags: postgresql
 
-- name: PostgreSQL service is running
-  service:
-    name: postgresql
-    state: started
-    enabled: yes
-  tags: postgresql
+- name: set sympa postgres database debconf parameter
+  debconf:
+    name: sympa
+    question: sympa/db/dbname
+    value: "{{ sympa_db_name }}"
+    vtype: string
+
+- name: set sympa postgres user debconf parameter
+  debconf:
+    name: sympa
+    question: sympa/db/app-user
+    value: "{{ sympa_db_user }}"
+    vtype: string
+
+- name: set sympa postgres password debconf parameter
+  debconf:
+    name: sympa
+    question: sympa/pgsql/app-pass
+    value: "{{ sympa_db_password | mandatory }}"
+    vtype: password
+
+    
