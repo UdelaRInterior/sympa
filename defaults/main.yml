@@ -1,8 +1,15 @@
 ---
 sympa_wwsympa_url: 'https://domain.tls'
 sympa_http_host: 'http://domain.tls'
-# PostgreSQL / mysql
-sympa_db_type: PostgreSQL
+sympa_listmaster: 
+- listmaster@domain.tls
+- postmaster@domain.tls
+- admin@domain.tls
+sympa_hostname: host.domain.tls
+sympa_webserver_type: "Apache 2"  # 'Apache 2' or 'Other'
+# Choos PostgreSQL or MySQL 
+sympa_db_type: pgsql   # values:psgsql o mysql
+# Database parameterd for both PostgreSQL and mysal
 sympa_db_name: sympa
 sympa_db_host: localhost
 sympa_db_port: 5432

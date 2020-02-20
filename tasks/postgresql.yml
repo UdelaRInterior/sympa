@@ -19,7 +19,7 @@
     enabled: yes
   tags: postgresql
 
-- name: Create database
+- name: Create sympa database
   become: true
   become_user: postgres
   postgresql_db:
@@ -31,7 +31,7 @@
     state: present
   tags: postgresql
 
-- name: user has access to the database
+- name: Create sympa user with access to the database
   become: true
   become_user: postgres
   postgresql_user:
@@ -41,6 +41,15 @@
     priv: ALL
     state: present
   tags: postgresql
+
+## Debconf keys for sympa database
+
+- name: set sympa postgres database debconf parameter
+  debconf:
+    name: sympa
+    question: sympa/database-type
+    value: pgsql
+    vtype: select
 
 - name: set sympa postgres database debconf parameter
   debconf:

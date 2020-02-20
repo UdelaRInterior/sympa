@@ -1,17 +1,29 @@
 ---
 
+- name: Install "debconf" and "debconf-utils" packages
+  apt:
+    name: "{{ paquetes }}"
+    state: latest
+  vars:
+    paquetes:
+    - debconf
+    - debconf-utils
+
 - name: install PostgreSQL
   include: postgresql.yml
-  when: sympa_db_restore and sympa_db_type == 'PostgreSQL'
+  when: sympa_db_restore and sympa_db_type == 'pgsql'
 
 - name: install MySQL
   include: mysql.yml
   when: sympa_db_restore and sympa_db_type == 'mysql'
 
-- name: Add a 'sympa' group
-  group:
-    name: sympa
-    state: present
+- name: Set sympa debconf keys' values
+  include_tasks: sympa_debconf.yml
+
+#- name: Add a 'sympa' group
+#  group:
+#    name: sympa
+#    state: present
 
 #- name: Create user sympa
 #  user:
@@ -19,37 +31,6 @@
 #    shell: /bin/bash
 #    groups: sympa
 
-- name: Set database
-  debconf:
-    name: sympa
-    question: sympa/database-type
-    value: "{{ sympa_db_type }}"
-    vtype: select
-
-- name: Set webserver to other
-  debconf:
-    name: sympa
-    question: wwsympa/webserver_type
-    value: Other
-    vtype: select
-
-- name: Set dbconfig-install to yes
-  debconf:
-    name: sympa
-    question: sympa/dbconfig-install
-#    value: no
-    value: yes
-    vtype: boolean
-  changed_when: false
-
-- name: Set dbconfig-install to yes
-  debconf:
-    name: sympa
-    question: sympa/dbconfig-install
-#    value: no
-    value: yes
-    vtype: boolean
-  changed_when: false
 
 #- name: Create mailname
 #  template:
