@@ -2,13 +2,13 @@
 
 - name: Install "debconf" and "debconf-utils" packages
   apt:
-    name: "{{ paquetes }}"
+    name:
+      - debconf
+      - debconf-utils
+    update_cache: yes
+    cache_valid_time: 3600
     state: latest
-  vars:
-    paquetes:
-    - debconf
-    - debconf-utils
-
+    
 - name: install PostgreSQL
   include: postgresql.yml
   when: sympa_db_restore and sympa_db_type == 'pgsql'
@@ -17,8 +17,6 @@
   include: mysql.yml
   when: sympa_db_restore and sympa_db_type == 'mysql'
 
-- name: Set sympa debconf keys' values
-  include_tasks: sympa_debconf.yml
 
 #- name: Add a 'sympa' group
 #  group:
@@ -65,6 +63,40 @@
 #    group: root
 #    mode: 0644
 
+#- name: Set sympa debconf keys' values
+#  include_tasks: sympa_debconf.yml
+
+- name: Definir opciones debconf de sympa
+  debconf:
+    name: "{{ item.name }}"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  loop:
+  - { name: 'sympa', question: 'wwsympa/webserver_type', value: '{{ sympa_webserver_type }}' , vtype: select }
+  - { name: 'sympa', question: 'sympa/dbconfig-install', value: '{{ sympa_db_restore }}' , vtype: boolean }
+  - { name: 'sympa', question: 'sympa/dbconfig-remove', value: '{{ sympa_db_restore }}' , vtype: boolean }
+  - { name: 'sympa', question: 'sympa/language', value: '{{ sympa_lang }}', vtype: select }
+  - { name: 'sympa', question: 'wwsympa/wwsympa_url', value: '{{ sympa_wwsympa_url }}', vtype: string }
+  - { name: 'sympa', question: 'sympa/listmaster', value: '{{ sympa_listmaster | join(",") }}', vtype: string }
+  - { name: 'sympa', question: 'sympa/hostname', value: '{{ sympa_hostname }}', vtype: string }
+#  - { name: 'sympa', question: 'sympa/xxx', value: "true", vtype: boolean }
+
+- name: Ver los valores debconf
+  command: debconf-show sympa
+
+- pause: 
+
+- name: Install packages needed by sympa
+  apt:
+    name:
+#      - dbconfig-mysql
+      - dbconfig-pgsql
+    update_cache: yes
+    cache_valid_time: 3600
+    state: latest
+
+
 - name: Install sympa
   apt:
     state: present
@@ -72,6 +104,12 @@
     cache_valid_time: 3600
     name: sympa
 #  ignore_errors: yes
+
+- name: Ver los valores debconf
+  command: debconf-show sympa
+
+- pause: 
+
 
 #####################################################
 

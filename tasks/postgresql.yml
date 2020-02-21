@@ -1,4 +1,5 @@
 ---
+## PostgreSQL for sympa installation and configuration tasks
 
 - name: Install PostgreSQL
   apt:
@@ -44,32 +45,23 @@
 
 ## Debconf keys for sympa database
 
-- name: set sympa postgres database debconf parameter
+- name: Definir opciones debconf de sympa, relativas a la base PostgreSQL
   debconf:
-    name: sympa
-    question: sympa/database-type
-    value: pgsql
-    vtype: select
+    name: "{{ item.name }}"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  loop:
+    ## the database type, here postgres
+  - { name: 'sympa', question: 'sympa/database-type', value: 'pgsql' , vtype: select }
+    ## the sympa database name
+  - { name: 'sympa', question: 'sympa/db/dbname', value: '{{ sympa_db_name }}' , vtype: string }
+    ## The sympa database user
+  - { name: 'sympa', question: 'sympa/db/app-user', value: '{{ sympa_db_user }}' , vtype: string }
+    ## The sympa database password
+  - { name: 'sympa', question: 'sympa/pgsql/app-pass', value: '{{ sympa_db_password | mandatory }}' , vtype: password }
+    ## Use the localhost (and not a distant host to define)
+  - { name: 'sympa', question: 'sympa/remote/host', value: 'localhost' , vtype: select }
 
-- name: set sympa postgres database debconf parameter
-  debconf:
-    name: sympa
-    question: sympa/db/dbname
-    value: "{{ sympa_db_name }}"
-    vtype: string
 
-- name: set sympa postgres user debconf parameter
-  debconf:
-    name: sympa
-    question: sympa/db/app-user
-    value: "{{ sympa_db_user }}"
-    vtype: string
-
-- name: set sympa postgres password debconf parameter
-  debconf:
-    name: sympa
-    question: sympa/pgsql/app-pass
-    value: "{{ sympa_db_password | mandatory }}"
-    vtype: password
-
-    
+...
