@@ -11,6 +11,7 @@
       - postgresql-contrib
       - libpq-dev
       - python-psycopg2
+      - dbconfig-pgsql
   tags: postgresql
 
 - name: PostgreSQL service is running

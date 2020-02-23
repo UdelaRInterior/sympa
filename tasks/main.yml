@@ -18,39 +18,32 @@
   when: sympa_db_restore and sympa_db_type == 'mysql'
 
 
-#- name: Add a 'sympa' group
-#  group:
-#    name: sympa
-#    state: present
+- name: Add a 'sympa' group
+  group:
+    name: sympa
+    state: present
 
-#- name: Create user sympa
-#  user:
-#    name: sympa
-#    shell: /bin/bash
-#    groups: sympa
+- name: Create user sympa
+  user:
+    name: sympa
+    shell: /bin/bash
+    groups: sympa
 
+- name: Create sympa dir
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/sympa
+    - /etc/mail
+    - /etc/sympa/sympa
 
-#- name: Create mailname
-#  template:
-#    src: mailname.j2
-#    dest: /etc/mailname
-#    mode: 0600
-
-#- name: Create sympa dir
-#  file:
-#    path: "{{ item }}"
-#    state: directory
-#  with_items:
-#    - /etc/sympa
-#    - /etc/mail
-#    - /etc/sympa/sympa
-
-#- name: Create sympa.conf
-#  template:
-#    src: sympa.conf.j2
-#    dest: /etc/sympa/sympa/sympa.conf
-#    mode: 0600
-#  notify: Restart sympa
+- name: Create sympa.conf
+  template:
+    src: sympa.conf.j2
+    dest: /etc/sympa/sympa/sympa.conf
+    mode: 0600
+  notify: Restart sympa
 
 #####################################################
 # Changes to fix a sympa package error in Debian 9  #
@@ -74,44 +67,29 @@
     vtype: "{{ item.vtype }}"
   loop:
   - { name: 'sympa', question: 'wwsympa/webserver_type', value: '{{ sympa_webserver_type }}' , vtype: select }
-  - { name: 'sympa', question: 'sympa/dbconfig-install', value: '{{ sympa_db_restore }}' , vtype: boolean }
-  - { name: 'sympa', question: 'sympa/dbconfig-remove', value: '{{ sympa_db_restore }}' , vtype: boolean }
+  #- { name: 'sympa', question: 'sympa/dbconfig-install', value: '{{ sympa_db_restore }}' , vtype: boolean }
+  #- { name: 'sympa', question: 'sympa/dbconfig-remove', value: '{{ sympa_db_restore }}' , vtype: boolean }
+  - { name: 'sympa', question: 'sympa/dbconfig-install', value: 'true' , vtype: boolean }
+  - { name: 'sympa', question: 'sympa/dbconfig-remove', value: 'true' , vtype: boolean }
   - { name: 'sympa', question: 'sympa/language', value: '{{ sympa_lang }}', vtype: select }
   - { name: 'sympa', question: 'wwsympa/wwsympa_url', value: '{{ sympa_wwsympa_url }}', vtype: string }
   - { name: 'sympa', question: 'sympa/listmaster', value: '{{ sympa_listmaster | join(",") }}', vtype: string }
   - { name: 'sympa', question: 'sympa/hostname', value: '{{ sympa_hostname }}', vtype: string }
+  - { name: 'sympa', question: 'sympa/internal/skip-preseed', value: 'false' , vtype: boolean }
 #  - { name: 'sympa', question: 'sympa/xxx', value: "true", vtype: boolean }
 
-- name: Ver los valores debconf
-  command: debconf-show sympa
+#- name: Ver los valores debconf
+#  command: debconf-show sympa
+#- pause: 
 
-- pause: 
-
-- name: Install packages needed by sympa
-  apt:
-    name:
-#      - dbconfig-mysql
-      - dbconfig-pgsql
-    update_cache: yes
-    cache_valid_time: 3600
-    state: latest
-
-
-- name: Install sympa
-  apt:
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
-    name: sympa
-#  ignore_errors: yes
-
-- name: Ver los valores debconf
-  command: debconf-show sympa
-
-- pause: 
-
-
-#####################################################
+# - name: Install packages needed by sympa
+#   apt:
+#     name:
+# #      - dbconfig-mysql
+#       - dbconfig-pgsql
+#     update_cache: yes
+#     cache_valid_time: 3600
+#     state: latest
 
 - name: Install packages
   apt:
@@ -128,6 +106,18 @@
       - libmime-lite-html-perl
       - libapache2-mod-fcgid
       - cpanminus
+
+- name: Install sympa
+  apt:
+    name: sympa
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+
+- name: Ver los valores debconf
+  command: debconf-show sympa
+
+- pause: 
 
 - name: configure apache2
   include: apache2.yml

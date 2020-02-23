@@ -48,6 +48,7 @@ sympa_server_admin: admin@domain.tls
 sympa_email: sympa
 sympa_gecos: SYMPA
 sympa_process_archive: False
+sympa_voot_feature: False
 sympa_max_wrong_password: 19
 sympa_static_content_path: /var/lib/sympa/static_content
 sympa_static_content_url: /static-sympa
