@@ -1,10 +1,27 @@
+# {{ ansible_managed }}
 ###\\\\ Descripción del servicio ////###
 
 ## domain
 ## Nombre del dominio primario de correo
 ## Ejemplo: domain	mail.example.org
 domain	{{ sympa_domain }}
+##Logo para reemplazar al de Sympa
+{% if sympa_logo_html_definition is defined %}
+logo_html_definition {{ sympa_logo_html_definition }}
+{% endif %}
 
+## email
+## Parte local de la dirección de correo de Sympa
+## Parte local (la que antecede al símbolo "@") de la dirección por la que la
+## interface de correo de Sympa acepta los comandos de correo.
+## Si cambias el valor por defecto tienes que modificar también los alias de
+## correo.
+email	{{ sympa_email }}
+## gecos
+## Nombre que se muestra del Sympa
+## Este parámetro se usa para el nombre que se muestra en el campo "De:" de
+## las cabeceras de los mensajes enviados por el propio Sympa.
+gecos	{{ sympa_gecos }}
 ## listmaster
 ## Dirección de correo de los listmasters
 ## Dirección de correo de los listmasters (usuarios autorizados para ejecutar
@@ -14,6 +31,31 @@ domain	{{ sympa_domain }}
 ## privilegio de gestionar todos los servidores virtuales .
 ## Ejemplo: listmaster	your_email_address@domain.tld
 listmaster	{{ sympa_listmaster | join(",") }}
+
+###\\\\ Parámetros de la interfaz web ////###
+
+## wwsympa_url
+## Prefijo de la URL de la interfaz web
+## Esto se usa para construir las URL de la interfaz web.
+## Ejemplo: wwsympa_url	https://web.example.org/sympa
+wwsympa_url	{{ sympa_wwsympa_url }}/sympa
+
+## http_host
+## Prefijo de la URL de WWSympa detrás de un proxy
+#http_host	
+{% if http_host is defined %}
+http_host     {{sympa_http_host}}
+{% endif %}
+
+## static_content_path
+## Directorio para conteidos estáticos
+static_content_path	{{ sympa_static_content_path }}
+
+## static_content_url
+## URL de los contenidos estáticos
+## El servidor HTTP tiene que relacionarlo con el directorio
+## "static_content_path".
+static_content_url	{{ sympa_static_content_url | default('/static-sympa') }}
 
 ## lang
 ## Idioma por defecto
@@ -33,11 +75,6 @@ supported_lang  {{ sympa_supported_lang }}
 ## interfaz web y en los asuntos de diferentes mensaje del servicio.
 title	{{ sympa_web_page_title }}
 
-## gecos
-## Nombre que se muestra del Sympa
-## Este parámetro se usa para el nombre que se muestra en el campo "De:" de
-## las cabeceras de los mensajes enviados por el propio Sympa.
-gecos	{{ sympa_gecos }}
 
 ## legacy_character_support_feature
 ## Soporte para conjuntos de caracteres heredados
@@ -547,13 +584,6 @@ arc_path	{{ sympa_arc_path }}
 
 ###\\\\ Miscelánea ////###
 
-## email
-## Parte local de la dirección de correo de Sympa
-## Parte local (la que antecede al símbolo "@") de la dirección por la que la
-## interface de correo de Sympa acepta los comandos de correo.
-## Si cambias el valor por defecto tienes que modificar también los alias de
-## correo.
-email  {{ sympa_email }}
 
 ## custom_robot_parameter
 ## Parámetro personalizado del robot
@@ -602,30 +632,6 @@ umask  {{ sympa_umask }}
 #cookie	`/usr/bin/head -n1 /etc/sympa/cookie`
 cookie {{ sympa_cookie }}
 
-###\\\\ Parámetros de la interfaz web ////###
-
-## wwsympa_url
-## Prefijo de la URL de la interfaz web
-## Esto se usa para construir las URL de la interfaz web.
-## Ejemplo: wwsympa_url	https://web.example.org/sympa
-wwsympa_url	{{ sympa_wwsympa_url }}/sympa
-
-## http_host
-## Prefijo de la URL de WWSympa detrás de un proxy
-#http_host	
-{% if http_host is defined %}
-http_host     {{sympa_http_host}}
-{% endif %}
-
-## static_content_url
-## URL de los contenidos estáticos
-## El servidor HTTP tiene que relacionarlo con el directorio
-## "static_content_path".
-static_content_url	/static-sympa
-
-## static_content_path
-## Directorio para conteidos estáticos
-static_content_path	{{ sympa_static_content_path }}
 
 ## log_facility
 ## Servicio de registro de sistema para la interfaz web
@@ -955,10 +961,6 @@ password_validation	{{ sympa_password_validation }}
 ldap_force_canonical_email	{{ sympa_ldap_force_caninical_email }}
 {% endif %}
 
-##Logo para reemplazar al de Sympa
-{% if sympa_logo_html_definition is defined %}
-logo_html_definition {{ sympa_logo_html_definition }}
-{% endif %}
 
 ###\\\\ Parámetros obsoletos ////###
 
