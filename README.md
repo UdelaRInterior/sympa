@@ -58,7 +58,7 @@ Each entry consists of the following:
 | `name`    | :heavy_check_mark: | Name of the auth option like ldap, user_table |
 | `options` | :heavy_check_mark: | Dict of options for the auth method           |
 
-## Example
+#### Example
 
 ```yaml
 sympa_auth:
@@ -90,7 +90,7 @@ Each list entry contains the following:
 | `path`  | :heavy_check_mark: | Path of the category  |
 | `title` | :heavy_check_mark: | Title of the category |
 
-## Example
+#### Example
 
 ```yaml
 sympa_topics:
@@ -99,6 +99,13 @@ title: Art
 - path: art/expressionism
 title: Expressionism
 ```
+
+### Database manager
+
+| Name                       | Required/Default   | Description                                                                               |
+|:---------------------------|:------------------:|:------------------------------------------------------------------------------------------|
+| `sympa_db_type`            | `mysql`            | Choice of database manager. `mysql` or `PostgreSQL`. Other sympa options are not managed. |
+| `sympa_install_db_package` | `False`            | Whether the db manager is installed previously (`False`) or the role installs it (`True`) |
 
 ### Sympa Variables
 
