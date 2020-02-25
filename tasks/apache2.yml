@@ -1,0 +1,52 @@
+---
+## Apache2 configuration for sympa tasks
+
+- name: Install Apache2 package
+  apt: 
+    name: apache2
+    state: present
+
+- name: Add Apache modules needed by Sympa
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - rewrite
+    - ssl
+    - suexec
+    - include
+    - fcgid
+
+- name: Create Apache Sympa conf (aliases)
+  template:
+    dest: /etc/apache2/conf-available/sympa.conf
+    src: apache/sympa-aliases.conf.j2
+    owner: root
+    group: root
+    mode: "0600"
+  notify: sympa - Restart apache2
+
+- name: Activate Apache Sympa conf
+  file:
+    path: /etc/apache2/conf-enabled/sympa.conf
+    src: ../conf-available/sympa.conf
+    state: link
+  notify: sympa - Restart apache2
+
+- name: Create Apache VirtualHost for Sympa
+  template:
+    dest: /etc/apache2/sites-available/sympa.conf
+    src: apache/sympa-vhost.conf.j2
+    owner: root
+    group: root
+    mode: "0644"
+  notify: sympa - Restart apache2
+
+- name: Activate Apache VirtualHost for Sympa
+  file:
+    path: /etc/apache2/sites-enabled/sympa.conf
+    src: ../sites-available/sympa.conf
+    state: link
+  notify: sympa - Restart apache2
+
+...

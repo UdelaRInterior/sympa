@@ -1,0 +1,16 @@
+## Sympa Apache fcgi configuration file
+## {{ ansible_managed }}
+
+Alias /{{ sympa_static_alias }} /var/lib/sympa/static_content
+<Directory /var/lib/sympa/static_content>
+    Require all granted
+</Directory>
+
+<IfModule mod_fcgid.c>
+
+    ScriptAlias /{{ sympa_script_alias }} /usr/lib/cgi-bin/sympa/wwsympa-wrapper.fcgi
+    <Directory /usr/lib/cgi-bin/sympa>
+        Require all granted
+    </Directory>
+
+</IfModule>

@@ -1,6 +1,11 @@
 ---
 ## Sympa configuration main tasks file
 
+#- debug: 
+#    var: ansible_facts
+#
+#- pause: 
+
 - name: Check that "debconf" and "debconf-utils" are installed
   apt:
     name:
@@ -92,7 +97,7 @@
     group: sympa
   loop: "{{ sympa_template_lists }}"
 
-- name: Create comment.tt2 for list templates
+- name: Create config.tt2 for custom list templates
   copy:
     content: "{{ item.config }}"
     dest: "/etc/sympa/create_list_templates/{{ item.name }}/config.tt2"
@@ -101,7 +106,7 @@
     mode: 0600
   loop: "{{ sympa_template_lists }}"
 
-- name: Create comment.tt2 for list templates
+- name: Create comment.tt2 for custom list templates
   copy:
     content: "{{ item.comment }}"
     dest: "/etc/sympa/create_list_templates/{{ item.name }}/comment.tt2"
@@ -110,7 +115,7 @@
     mode: 0600
   loop: "{{ sympa_template_lists }}"
 
-- name: Disable default templates
+- name: Disable default list templates
   lineinfile:
     path: /usr/share/sympa/default/create_list.conf
     line: "{{ item }} hidden"
@@ -125,7 +130,7 @@
     - private_working_group
     - public_web_forum
 
-- name: Enable default templates
+- name: Enable default list templates
   lineinfile:
     path: /usr/share/sympa/default/create_list.conf
     line: '{{ item }} hidden'
@@ -176,5 +181,9 @@
     minute: "0"
     hour: "2"
     job: "/usr/lib/sympa/bin/sympa.pl --reload_list_config"
+
+- name: configure apache2 for sympa
+  include_tasks: apache2.yml
+  when: sympa_apache2_configure
 
 ...

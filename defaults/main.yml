@@ -1,4 +1,7 @@
 ---
+## Sympa Ansible role default variables
+
+sympa_domain: "{{ ansible_fqdn }}"
 sympa_show_default_templates: false
 sympa_template_lists: []
 ## Define the following variables for ldap alias manager
@@ -14,7 +17,7 @@ sympa_db_type: mysql             # mysql or PostgreSQL
 sympa_install_db_package: False  # yes for this role to install mysql or postgres, no if installed elsewhere 
 sympa_db_name: sympa
 sympa_db_host: localhost
-sympa_db_port: 3306
+sympa_db_port: "{{ 5432 if sympa_db_type == 'PostgreSQL' else 3306 }}"
 sympa_db_user: sympa
 sympa_lang: en
 sympa_auth:
@@ -119,3 +122,19 @@ sympa_ldap_force_canonical_email: 1
 sympa_review_page_size: 25
 sympa_webserver_type: Other                        # 'Other' or 'Apache 2'
 sympa_web_page_title: Mailing lists service
+
+sympa_apache2_configure: false
+sympa_www_domain: '{{ sympa_domain }}'
+sympa_server_admin: 'listmaster@{{ sympa_domain }}'
+sympa_wwsympa_url: 'https://{{ sympa_www_domain }}/{{ sympa_script_alias }}'
+sympa_script_alias: wws
+sympa_static_alias: static-sympa
+
+## SSL webserver certificates
+sympa_ssl_cert_file:     /etc/ssl/certs/ssl-cert-snakeoil.pem
+sympa_ssl_cert_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+## It's worthful to install certbot and define
+# sympa_ssl_cert_file:     /etc/letsencrypt/live/{{ sympa_www_domain }}/cert.pem
+# sympa_ssl_cert_key_file: /etc/letsencrypt/live/{{ sympa_www_domain }}/privkey.pem
+
+...
