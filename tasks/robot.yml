@@ -24,4 +24,23 @@
     group: sympa
     mode: 0600
   when: robot.topics is defined
+
+- name: Optional Apache robot configuration
+  block:
+  - name: Create Apache robot VirtualHost
+    template:
+      dest: "/etc/apache2/sites-available/{{ robot.domain }}.conf"
+      src: apache/sympa-robot-vhost.conf.j2
+      owner: root
+      group: root
+      mode: "0644"
+    notify: sympa - Restart apache2
+
+  - name: Activate Apache robot VirtualHost
+    file:
+      path: "/etc/apache2/sites-enabled/{{ robot.domain }}.conf"
+      src: "../sites-available/{{ robot.domain }}.conf"
+      state: link
+    notify: sympa - Restart apache2
+  when: sympa_apache2_configure
 ...

@@ -155,9 +155,9 @@ sympa_robots: []
 #       visibility: noconceal
 
 sympa_apache2_configure: false
-sympa_www_domain: '{{ sympa_domain }}'
-sympa_server_admin: 'listmaster@{{ sympa_domain }}'
-sympa_wwsympa_url: 'https://{{ sympa_www_domain }}/{{ sympa_script_alias }}'
+sympa_www_domain: "{{ sympa_domain }}"
+sympa_server_admin: "listmaster@{{ sympa_domain }}"
+sympa_wwsympa_url: "https://{{ sympa_www_domain }}/{{ sympa_script_alias }}"
 sympa_script_alias: wws
 sympa_static_alias: static-sympa
 

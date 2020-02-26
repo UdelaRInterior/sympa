@@ -1,0 +1,58 @@
+## {{ robot.domain }} Sympa robot Apache VirtualHosts
+## {{ ansible_managed }}
+
+<VirtualHost *:80>
+        ServerName {{ robot.domain | mandatory }}
+        ServerAdmin {{ robot.server_admin | default ( "listmaster@{{ robot.domain }}" ) }}
+
+        Redirect / https://{{ robot.domain }}/
+
+        ErrorLog ${APACHE_LOG_DIR}/{{ robot.domain }}-error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog ${APACHE_LOG_DIR}/{{ robot.domain }}-access.log combined
+
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+	ServerName {{ robot.domain | mandatory }}
+	ServerAdmin {{ robot.server_admin | default ( "listmaster@{{ robot.domain }}" ) }}
+
+        RewriteEngine on
+	RewriteRule ^/?$ /{{ sympa_script_alias }} [R=301]
+
+	<Location /{{ sympa_script_alias }}>
+		SetHandler fcgid-script
+		Require all granted
+	</Location>
+
+	ErrorLog ${APACHE_LOG_DIR}/{{ robot.domain }}-ssl_error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/{{ robot.domain }}-ssl_access.log combined
+
+	SSLEngine on
+        SSLCertificateFile    {{ robot.ssl_cert_file | default ( '/etc/ssl/certs/ssl-cert-snakeoil.pem' ) }}
+        SSLCertificateKeyFile {{ robot.ssl_cert_key_file | default ( '/etc/ssl/private/ssl-cert-snakeoil.key' ) }}
+
+	<FilesMatch "\.(cgi|shtml|phtml|php)$">
+		SSLOptions +StdEnvVars
+	</FilesMatch>
+	<Directory /usr/lib/cgi-bin>
+		SSLOptions +StdEnvVars
+	</Directory>
+
+	BrowserMatch "MSIE [2-6]" \
+		nokeepalive ssl-unclean-shutdown \
+		downgrade-1.0 force-response-1.0
+	BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+
+</VirtualHost>
+</IfModule>

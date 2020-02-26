@@ -1,5 +1,9 @@
 # Changelog of ansible-sympa role
 
+## v0.3.1-nightbuilt
+
+* Configure Sympa robots Apache VHosts (forgotten in v0.3.0-pr)
+
 ## [v0.3.0-pr](https://github.com/UdelaRInterior/ansible-sympa/releases/tag/v0.3.0-pr)
 
 * Optional Sympa robots configuration (sympa & web interface)
@@ -17,8 +21,6 @@
 * PostgreSQL management integration
 * Optional Database manager (MySQL and PostgreSQL) installation by the role itself
 * Upstream [Pull Request](https://github.com/stuvusIT/sympa/pull/11) for Galaxy Release
-
-
 
 ## [v0.1.0](https://github.com/stuvusIT/sympa/releases/tag/0.1.0)
 

@@ -54,13 +54,13 @@
     - Reload sympa config
     - Restart sympa
 
-- name: Install packages
+- name: Install Sympa packages
   apt:
     name:
       - sympa
       - fcgiwrap
 
-- name: Fix permissions
+- name: Fix Sympa config files permissions
   file:
     path: "/etc/sympa/{{ item }}"
     owner: sympa
@@ -165,12 +165,6 @@
     mode: 0600
   notify: Restart sympa
 
-- name: Configure Sympa robots
-  include_tasks: robot.yml
-  with_items: '{{ sympa_robots }}'
-  loop_control:
-    loop_var: robot
-
 - name: Create topics.conf
   template:
     src: topics.conf.j2
@@ -193,4 +187,9 @@
   include_tasks: apache2.yml
   when: sympa_apache2_configure
 
+- name: Configure Sympa robots
+  include_tasks: robot.yml
+  with_items: '{{ sympa_robots }}'
+  loop_control:
+    loop_var: robot
 ...
