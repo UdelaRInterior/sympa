@@ -1,0 +1,27 @@
+---
+## Configuration of a Sympa robot
+
+- name: Create robot directory
+  file:
+    path: "/etc/sympa/{{ robot.domain }}"
+    state: directory
+
+- name: Create robot config file
+  template:
+    src: robot.conf.j2
+    dest: "/etc/sympa/{{ robot.domain }}/robot.conf"
+    owner: sympa
+    group: sympa
+    mode: 0600
+  notify: Restart sympa
+
+
+- name: Create robot topics file
+  template:
+    src: topics.robot.conf.j2
+    dest: /etc/sympa/{{ robot.domain }}/topics.conf
+    owner: sympa
+    group: sympa
+    mode: 0600
+  when: robot.topics is defined
+...

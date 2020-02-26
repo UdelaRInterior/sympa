@@ -165,6 +165,12 @@
     mode: 0600
   notify: Restart sympa
 
+- name: Configure Sympa robots
+  include_tasks: robot.yml
+  with_items: '{{ sympa_robots }}'
+  loop_control:
+    loop_var: robot
+
 - name: Create topics.conf
   template:
     src: topics.conf.j2
@@ -181,6 +187,7 @@
     minute: "0"
     hour: "2"
     job: "/usr/lib/sympa/bin/sympa.pl --reload_list_config"
+  when: sympa_cron_reload_list_config
 
 - name: configure apache2 for sympa
   include_tasks: apache2.yml

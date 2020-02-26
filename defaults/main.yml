@@ -123,6 +123,37 @@ sympa_review_page_size: 25
 sympa_webserver_type: Other                        # 'Other' or 'Apache 2'
 sympa_web_page_title: Mailing lists service
 
+sympa_cron_reload_list_config: true
+
+sympa_robots: []
+## you can define robots configuration with the following structure: 
+#sympa_robots:
+#- domain: robot.domain.tld
+#  server_admin: listmaster@robot.domain.tld
+#  listmaster: 
+#    - user1@domain.tld
+#    - user2@domain2.tld
+#  create_list: public_listmaster
+#  title: 'Listas de correo sympa - prueba'
+#  default_home: lists
+#  dark_color: '#00aa00'
+#  light_color: '#ddffdd'
+#  selected_color: '#0099cc'
+#  logo_html_definition: '<a href="http://robot.domain.tld"><img style="float: left; margin-top: 3px; margin-left: 35px; height:115px" src="<my_logo_url$>" alt="My organization" /></a>'
+#   topics:
+#     - path: este
+#       title: Este
+#       visibility: noconceal
+#     - path: este/rocha
+#       title: Rocha
+#       visibility: noconceal
+#     - path: este/maldonado
+#       title: Maldonado
+#       visibility: noconceal
+#     - path: este/33
+#       title: Treinta y Trés
+#       visibility: noconceal
+
 sympa_apache2_configure: false
 sympa_www_domain: '{{ sympa_domain }}'
 sympa_server_admin: 'listmaster@{{ sympa_domain }}'
@@ -136,5 +167,6 @@ sympa_ssl_cert_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
 ## It's worthful to install certbot and define
 # sympa_ssl_cert_file:     /etc/letsencrypt/live/{{ sympa_www_domain }}/cert.pem
 # sympa_ssl_cert_key_file: /etc/letsencrypt/live/{{ sympa_www_domain }}/privkey.pem
+sympa_apache_disable_default_sites: false
 
 ...

@@ -1,0 +1,41 @@
+## Sympa {{ robot.domain }} configuration file
+## {{ ansible_managed }}
+
+## Check the documentation related to virtual hosting on https://sympa-community.github.io/gpldoc/man/sympa.conf.5.html
+
+# Documentation reference: http://www.sympa.org/manual/dkim
+dkim_feature    on
+dkim_add_signature_to   list,robot
+dkim_signature_apply_on md5_authenticated_messages,smime_authenticated_messages, dkim_authenticated_messages,editor_validated_messages
+dkim_private_key_path   /etc/opendkim/keys/{{ robot.domain }}/email.private
+dkim_signer_domain      {{ robot.domain }}
+dkim_selector   email
+dkim_signer_identity    none
+dmarc_protection_mode dmarc_reject
+
+## This hostname will be compared with 'SERVER_NAME' ENV var in wwsympa.fcgi
+## To deduce which Virtual Robot is being queried
+http_host  {{ robot.domain }}
+
+## Listmasters email addresses
+
+listmaster	{{ robot.listmaster | join(",") }}
+
+## Title for the ML service
+## It is displayed as a title in the web interface
+title {{ robot.title }}
+
+# create_list  listmaster
+
+## The default action when entering the web interface
+## Can be 'lists', 'home' or 'which'
+default_home  {{ robot.default_home }}
+
+## You can define custom colors for the Virtual Robot's
+## Web interface
+dark_color {{ robot.dark_color }} 
+light_color {{ robot.light_color }}
+selected_color {{ robot.selected_color }}
+
+### Configuraciones adicionales sl.edu.uy
+logo_html_definition {{ robot.logo_html_definition }}

@@ -1,0 +1,11 @@
+## Topics for {{ robot.domain }} sympa robot
+# {{ ansible_managed }}
+
+{% for topic in robot.topics %}
+{{ topic.path }}
+title {{ topic.title }}
+{% if topic.visibility is defined %}
+visibility {{ topic.visibility }}
+{% endif %}
+
+{% endfor %}

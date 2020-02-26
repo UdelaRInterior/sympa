@@ -49,4 +49,13 @@
     state: link
   notify: sympa - Restart apache2
 
+- name: Optionally disable Apache2 default sites
+  file:
+    path: "/etc/apache2/sites-enabled/{{ item }}"
+    state: absent
+  with_items:
+    - "000-default.conf"
+    - "000-default-ssl*"
+  notify: sympa - Restart apache2
+  when: sympa_apache_disable_default_sites
 ...
