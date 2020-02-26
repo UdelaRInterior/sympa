@@ -111,8 +111,8 @@ title: Expressionism
 
 | Name                                       | Required/Default                                                                                                      | Description                                                                                                                                                                                                                                                                                                                              |
 |:-------------------------------------------|:---------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `sympa_domain`                             | :heavy_check_mark:                                                                                                    | Main robot hostname                                                                                                                                                                                                                                                                                                                      |
-| `sympa_listmaster`                         | :heavy_check_mark:                                                                                                    | List of email address to promote to listmaster                                                                                                                                                                                                                                                                                           |
+| `sympa_domain`                             | `"{{ ansible_fqdn }}"`                                                                                                    | Main robot hostname                                                                                                                                                                                                                                                                                                                      |
+| `sympa_listmaster`                         | `listmaster@{{ sympa_domain }}`                                                                                                    | List of email address to promote to listmaster                                                                                                                                                                                                                                                                                           |
 | `sympa_wwsympa_url`                        | :heavy_check_mark:                                                                                                    | URL of main Web page                                                                                                                                                                                                                                                                                                                     |
 | `sympa_email`                              | :heavy_multiplication_x:                                                                                              | Local part of sympa email address                                                                                                                                                                                                                                                                                                        |
 | `sympa_db_password`                        | :heavy_check_mark:                                                                                                    | Password for the database connection                                                                                                                                                                                                                                                                                                     |
@@ -205,6 +205,25 @@ title: Expressionism
 | `sympa_ldap_alias_manager_conf`            | ``                                                                                                                    | Dict containing alias manager config attributes                                                                                                                                                                                                                                                                                          |
 | `sympa_auth`                               | `[{ name: "user:table", options: {regexp: ".*"}}]`                                                                    | List of auth methods used in order.                                                                                                                                                                                                                                                                                                      |
 
+### Sympa robots variables
+
+`sympa_robots` is a list of Sympa robots definitions, empty by default. Each entry contains
+
+| Name                    | Required/Default     | Description                                |
+|:------------------------|:--------------------:|:-------------------------------------------|
+| `domain`                | :heavy_check_mark:   |  Robot mail and web domain                 |
+| `server_admin`          | :heavy_check_mark:   |  Webserver VHost admin                     |
+| `listmaster`            | :heavy_check_mark:   |  list of listamsters mail entries          |
+| `listmaster`            | :heavy_check_mark:   ||
+| `create_list`           | 
+#  : public_listmaster
+#  title: 'Listas de correo sympa - prueba'
+#  default_home: lists
+#  dark_color: '#00aa00'
+#  light_color: '#ddffdd'
+#  selected_color: '#0099cc'
+#  logo_html_definition: '<a href="http://robot.domain.tld"><img style="float: left; margin-top: 3px; margin-left: 35px; height:115px" src="<my_logo_url$>" alt="My organization" /></a>'
+#  topics:
 
 ## License
 
