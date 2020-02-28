@@ -14,10 +14,13 @@ galaxy_info:
         - yakkety
     - name: Debian
       versions:
-        - jessie
+        - stretch
 
   galaxy_tags:
+    - sympa
+    - mailing list
     - stuvus
+    - udelar interior
     - Insert ansible galaxy tags here
 
 dependencies: []
