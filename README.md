@@ -1,15 +1,16 @@
 # sympa
-This is an Ansible role which sets up a sympa
+
+This is an Ansible role which sets up a [Sympa](https://sympa.org) mailing list manager.
 
 
 ## Requirements
 
-Debian or Ubuntu with a webserver that serves the sympa web app and a mysql database for it.
+Debian stretch or Ubuntu server. MySQL/MariaDB or PostgreSQL database options. Database manager can be previously installed in the host (default) or optionnally installed by the role itself. Webserver for Sympa should be configured elsewhere.
 
 
 ## Role Variables
 
-For the full documentation see https://sympa-community.github.io/, this was tested with Sympa Version 6.2.16
+For the full documentation see https://sympa-community.github.io/, this role was tested with Sympa Version 6.2.16 (Debian stretch sympa package).
 
 ### List Templates
 `sympa_template_lists` is a list of templates to be defined.
@@ -104,7 +105,7 @@ title: Expressionism
 
 | Name                       | Required/Default   | Description                                                                               |
 |:---------------------------|:------------------:|:------------------------------------------------------------------------------------------|
-| `sympa_db_type`            | `mysql`            | Choice of database manager. `mysql` or `PostgreSQL`. Other sympa options are not managed. |
+| `sympa_db_type`            | `mysql`            | Choice of database manager. `MySQL` or `Pg`. `mysql` and `PostgreSQL` values are acceptable. Other database options are not managed. |
 | `sympa_install_db_package` | `False`            | Whether the db manager is installed previously (`False`) or the role installs it (`True`) |
 
 ### Sympa Variables
@@ -215,7 +216,7 @@ title: Expressionism
 | `server_admin`          | :heavy_check_mark:   |  Webserver VHost admin                     |
 | `listmaster`            | :heavy_check_mark:   |  list of listamsters mail entries          |
 | `listmaster`            | :heavy_check_mark:   ||
-| `create_list`           | 
+| `create_list`           |
 #  : public_listmaster
 #  title: 'Listas de correo sympa - prueba'
 #  default_home: lists
@@ -233,3 +234,4 @@ This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 Inter
 ## Author Information
 
 * [Fritz Otlinghaus (Scriptkiddi)](https://github.com/Scriptkiddi) _fritz.otlinghaus@stuvus.uni-stuttgart.de_
+* [UdelaR Interior](https://github.com/UdelaRInterior) contributions

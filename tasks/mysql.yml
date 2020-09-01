@@ -49,14 +49,4 @@
     priv: '{{ sympa_db_name }}.*:ALL,GRANT'
   no_log: True
 
-- name: Set debconf options for sympa mysql database
-  debconf:
-    name: "{{ item.name }}"
-    question: "{{ item.question }}"
-    value: "{{ item.value }}"
-    vtype: "{{ item.vtype }}"
-  loop:
-      ## For MySQL, we don't use dbconfig at sympa installation, previous settings are enough 
-  - { name: 'sympa', question: 'sympa/dbconfig-install', value: 'false' , vtype: boolean }
-
 ...

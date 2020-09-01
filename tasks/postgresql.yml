@@ -49,20 +49,15 @@
     password: "{{ sympa_db_password | mandatory }}"
     priv: ALL
     state: present
-  tags: postgresql
+  
 
 ## Debconf keys for sympa database
 
-- name: Set debconf options for sympa postgresql database
+- name: Set password debconf option for Sympa PostgreSQL database
   debconf:
-    name: "{{ item.name }}"
-    question: "{{ item.question }}"
-    value: "{{ item.value }}"
-    vtype: "{{ item.vtype }}"
-  loop:
-      ## set the database user password
-  - { name: 'sympa', question: 'sympa/pgsql/app-pass', value: '{{ sympa_db_password | mandatory }}' , vtype: password }
-      ## For PostgreSQL, we configure the database at sympa installation with dbconfig
-  - { name: 'sympa', question: 'sympa/dbconfig-install', value: 'true' , vtype: boolean }
+    name: sympa
+    question: sympa/pgsql/app-pass
+    value: "{{ sympa_db_password | mandatory }}"
+    vtype: password
 
 ...

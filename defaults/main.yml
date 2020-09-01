@@ -15,8 +15,8 @@ sympa_template_lists: []
 # sympa_create_list: public_listmaster           # this is not yet considered and should be
 
 ## Database variables
-sympa_db_type: mysql             # mysql or PostgreSQL
-sympa_install_db_package: False  # yes for this role to install mysql or postgres, no if installed elsewhere 
+sympa_db_type: mysql             #'MySQL' or 'mysql'. or 'PostgreSQL' or 'Pg'. 'mysql' and 'Pg' values are deprecated
+sympa_install_db_package: False  # 'True' for this role to install mysql or postgresql package, 'False' if installed elsewhere
 sympa_db_name: sympa
 sympa_db_host: localhost
 sympa_db_port: "{{ 5432 if sympa_db_type == 'PostgreSQL' else 3306 }}"
@@ -128,11 +128,11 @@ sympa_web_page_title: Mailing lists service
 sympa_cron_reload_list_config: true
 
 sympa_robots: []
-## you can define robots configuration with the following structure: 
+## you can define robots configuration with the following structure:
 #sympa_robots:
 #- domain: robot.domain.tld
 #  server_admin: listmaster@robot.domain.tld
-#  listmaster: 
+#  listmaster:
 #    - user1@domain.tld
 #    - user2@domain2.tld
 #  create_list: public_listmaster
@@ -164,6 +164,8 @@ sympa_server_admin: "{{ sympa_listmaster }}"
 sympa_wwsympa_url: "https://{{ sympa_www_domain }}/{{ sympa_script_alias }}"
 sympa_script_alias: wws
 sympa_static_alias: static-sympa
+sympa_css_path: /var/lib/sympa/css
+sympa_css_url: /css-sympa
 
 ## SSL webserver certificates
 sympa_ssl_cert_file:     /etc/ssl/certs/ssl-cert-snakeoil.pem

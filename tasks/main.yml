@@ -15,11 +15,13 @@
 
 - name: MySQL/MariaDB configuration
   include_tasks: mysql.yml
-  when: sympa_db_type | lower == 'mysql'
+  when: sympa_db_type == 'MySQL' or sympa_db_type == 'mysql'
+  tags: mysql
 
 - name: PostgreSQL configuration
   include_tasks: postgresql.yml
-  when: sympa_db_type | lower == 'postgresql'
+  when: sympa_db_type == 'PostgreSQL' or sympa_db_type == 'Pg'
+  tags: postgresql
 
 - name: Set debconf options for sympa
   debconf:
@@ -30,6 +32,8 @@
   loop:
       ## set the database type
   - { name: 'sympa', question: 'sympa/database-type', value: '{{ sympa_db_type }}' , vtype: select }
+      ## This Ansible role configures the database, not dbconfig at sympa package installation 
+  - { name: 'sympa', question: 'sympa/dbconfig-install', value: 'false' , vtype: boolean }
       ## Set the sympa database name
   - { name: 'sympa', question: 'sympa/db/dbname', value: '{{ sympa_db_name }}' , vtype: string }
       ## Set the sympa database user
@@ -59,6 +63,7 @@
     name:
       - sympa
       - fcgiwrap
+    state: latest
 
 - name: Fix Sympa config files permissions
   file:
