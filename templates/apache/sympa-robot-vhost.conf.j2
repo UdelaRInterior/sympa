@@ -49,6 +49,16 @@
 		SSLOptions +StdEnvVars
 	</Directory>
 
+  Alias /{{ sympa_static_alias }} "{{ sympa_static_content_path }}"
+  <Directory "{{ sympa_static_content_path }}">
+          Require all granted
+  </Directory>
+
+  Alias /{{ sympa_css_url }} "{{ sympa_css_path }}"
+  <Directory "{{ sympa_css_path }}">
+          Require all granted
+  </Directory>
+
 	BrowserMatch "MSIE [2-6]" \
 		nokeepalive ssl-unclean-shutdown \
 		downgrade-1.0 force-response-1.0

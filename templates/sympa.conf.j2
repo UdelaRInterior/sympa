@@ -74,6 +74,10 @@ log_socket_type	{{ sympa_log_socket_type }}
 ## is distributed with Postfix)
 sendmail	{{ sympa_sendmail }}
 
+## sendmail alias
+## Path to file aliases
+sendmail_aliases {{ sympa_sendmail_aliases }}
+
 ## maxsmtp
 ## Max. number of Sendmail processes (launched by Sympa) running
 ## simultaneously
@@ -463,3 +467,5 @@ use_fast_cgi	1
 alias_manager {{ sympa_alias_manager }}
 {% endif %}
 
+css_path {{ sympa_css_path }}
+css_url {{ sympa_css_url }}
