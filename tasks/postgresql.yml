@@ -23,7 +23,7 @@
       - postgresql
       - postgresql-contrib
       - libpq-dev
-      - python-psycopg2
+      - python3-psycopg2
       - dbconfig-pgsql
   when: sympa_install_db_package
   tags: postgresql
