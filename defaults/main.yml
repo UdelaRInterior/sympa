@@ -138,4 +138,6 @@ sympa_ssl_cert_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
 # sympa_ssl_cert_file:     /etc/letsencrypt/live/{{ sympa_www_domain }}/cert.pem
 # sympa_ssl_cert_key_file: /etc/letsencrypt/live/{{ sympa_www_domain }}/privkey.pem
 
+sympa_newaliases_as_root: False
+
 ...

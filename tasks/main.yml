@@ -49,7 +49,8 @@
   - { name: 'sympa', question: 'sympa/remote/host', value: 'localhost' , vtype: select }
       ## Set the webserver type
   - { name: 'sympa', question: 'wwsympa/webserver_type', value: '{{ sympa_webserver_type }}' , vtype: select }
-
+      ## sympa_newaliases-wrapper as root?
+  - { name: 'sympa', question: 'sympa/sympa_newaliases-wrapper-setuid-root', value: '{{ sympa_newaliases_as_root }}' , vtype: boolean }
 
 - name: Create sympa dir
   file:
